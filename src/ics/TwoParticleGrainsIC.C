@@ -1,5 +1,5 @@
 #include "TwoParticleGrainsIC.h"
-#include "MooseRandom.h"
+#include "MooseMesh.h"
 
 template<>
 InputParameters validParams<TwoParticleGrainsIC>()
