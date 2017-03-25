@@ -1,7 +1,7 @@
 [GlobalParams]
   var_name_base = gr
   op_num = 2.0
-  en_ratio = 1
+  #en_ratio = 1
 []
 
 [Mesh]
@@ -274,8 +274,8 @@
     block = '0'
     T = 1200.0
     int_width = 20
-    GB_energy = 6.86
-    surface_energy = 9.33
+    #GB_energy = 6.86
+    #surface_energy = 9.33
     GBmob0 = 3.986e-6
     Qv = 2.0
     Qgb = 4.143
@@ -476,45 +476,49 @@
   #[../]
 []
 
-[Adaptivity]
-  marker = errorfrac
-  max_h_level = 4
-  [./Indicators]
-    [./error]
-      type = GradientJumpIndicator
-      variable = bnds
-    [../]
-  [../]
-  [./Markers]
-    [./bound_adapt]
-      type = ValueThresholdMarker
-      third_state = DO_NOTHING
-      coarsen = 1.0
-      refine = 0.99
-      variable = bnds
-      invert = true
-    [../]
-    [./errorfrac]
-      type = ErrorFractionMarker
-      coarsen = 0.1
-      indicator = error
-      refine = 0.7
-    [../]
-  [../]
-[]
-
+#[Adaptivity]
+#  marker = bound_adapt
+#  max_h_level = 4
+#  [./Indicators]
+#    [./error]
+#      type = GradientJumpIndicator
+#      variable = bnds
+#    [../]
+#  [../]
+#  [./Markers]
+#    [./bound_adapt]
+#      type = ValueThresholdMarker
+#      third_state = DO_NOTHING
+#      coarsen = 1.0
+#      refine = 0.99
+#      variable = bnds
+#      invert = true
+#    [../]
+#    [./errorfrac]
+#      type = ErrorFractionMarker
+#      coarsen = 0.1
+#      indicator = error
+#      refine = 0.7
+#    [../]
+#  [../]
+#[]
+#
 
 [Outputs]
-  exodus = true
+  #exodus = true
   print_linear_residuals = true
   csv = true
   gnuplot = true
   print_perf_log = true
   #interval = 10
-  #file_base = 2016_11_15_2p_conservation_actual
-  [./console]
-    type = Console
-    perf_log = true
+  file_base = grad_check
+  #[./console]
+  #  type = Console
+  #  perf_log = true
+  #[../]
+  [./exodus]
+    type = Exodus
+    elemental_as_nodal = true
   [../]
 []
 

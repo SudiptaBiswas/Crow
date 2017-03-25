@@ -21,6 +21,7 @@
 #include "ACSinteringGrowth.h"
 #include "ACParticleGrowth.h"
 #include "ElectricFieldKernel.h"
+#include "ElectricBCKernel.h"
 #include "VacancySourceTermKernel.h"
 #include "RandomVacancySourceTermKernel.h"
 #include "LangevinNoiseVoid.h"
@@ -47,6 +48,7 @@
 #include "SinteringMtrxMobility.h"
 #include "SinteringDiffusion.h"
 #include "ThermalVariation.h"
+#include "ElectricBCMat.h"
 
 #include "PolycrystalSinteringKernelAction.h"
 #include "PolycrystalSinteringMaterialAction.h"
@@ -135,6 +137,7 @@ CrowApp::registerObjects(Factory & factory)
   registerKernel(ACSinteringGrowth);
   registerKernel(ACParticleGrowth);
   registerKernel(ElectricFieldKernel);
+  registerKernel(ElectricBCKernel);
   registerKernel(VacancySourceTermKernel);
   registerKernel(RandomVacancySourceTermKernel);
   registerKernel(ConservedLangevinNoiseVoidSource);
@@ -159,6 +162,7 @@ CrowApp::registerObjects(Factory & factory)
   registerMaterial(SinteringMobility);
   registerMaterial(SinteringMtrxMobility);
   registerMaterial(SinteringDiffusion);
+  registerMaterial(ElectricBCMat);
 
   registerInitialCondition(TwoParticleGrainsIC);
   registerInitialCondition(TwoParticleDensityIC);

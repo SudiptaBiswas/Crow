@@ -195,7 +195,7 @@
     type = ExternalForceDensityMaterial
     c = c
     etas = 'eta'
-    k = 0.4
+    k = 0.5
     force_y = load_y
     force_x = load_x
   [../]
