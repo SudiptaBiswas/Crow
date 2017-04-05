@@ -49,6 +49,8 @@
 #include "SinteringDiffusion.h"
 #include "ThermalVariation.h"
 #include "ElectricBCMat.h"
+#include "RadiationDefectSource.h"
+#include "RadiationDefectCreation.h"
 
 #include "PolycrystalSinteringKernelAction.h"
 #include "PolycrystalSinteringMaterialAction.h"
@@ -143,6 +145,7 @@ CrowApp::registerObjects(Factory & factory)
   registerKernel(ConservedLangevinNoiseVoidSource);
   registerKernel(LangevinNoiseVoid);
   registerKernel(RigidBodyMotionKernel);
+  registerKernel(RadiationDefectSource);
   registerFunction(RandomNumberGeneration);
 
   registerMaterial(PFDiffusion);
@@ -163,6 +166,7 @@ CrowApp::registerObjects(Factory & factory)
   registerMaterial(SinteringMtrxMobility);
   registerMaterial(SinteringDiffusion);
   registerMaterial(ElectricBCMat);
+  registerMaterial(RadiationDefectCreation);
 
   registerInitialCondition(TwoParticleGrainsIC);
   registerInitialCondition(TwoParticleDensityIC);
