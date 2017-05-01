@@ -35,6 +35,16 @@
     family = MONOMIAL
     block = 1
   [../]
+  [./fp_xx]
+    order = CONSTANT
+    family = MONOMIAL
+    block = 1
+  [../]
+  [./fp_yy]
+    order = CONSTANT
+    family = MONOMIAL
+    block = 1
+  [../]
 []
 
 [Functions]
@@ -55,8 +65,8 @@
     gc_prop_var = 'gc_prop'
     G0_var = 'G0'
     dG0_dstrain_var = 'dG0_dstrain'
-    disp_x = disp_x
-    disp_y = disp_y
+    #disp_x = disp_x
+    #disp_y = disp_y
   [../]
   [./solid_x]
     type = StressDivergencePFFracTensors
@@ -110,6 +120,24 @@
     type = MaterialRealAux
     variable = peeq
     property = ep_eqv
+    execute_on = timestep_end
+    block = 1
+  [../]
+  [./fp_xx]
+    type = RankTwoAux
+    variable = fp_xx
+    rank_two_tensor = fp
+    index_j = 0
+    index_i = 0
+    execute_on = timestep_end
+    block = 1
+  [../]
+  [./fp_yy]
+    type = RankTwoAux
+    variable = fp_yy
+    rank_two_tensor = fp
+    index_j = 1
+    index_i = 1
     execute_on = timestep_end
     block = 1
   [../]
@@ -204,6 +232,16 @@
     type = NodalSum
     variable = resid_y
     boundary = 2
+  [../]
+  [./fp_xx]
+    type = ElementAverageValue
+    variable = fp_xx
+    block = 'ANY_BLOCK_ID 1'
+  [../]
+  [./fp_yy]
+    type = ElementAverageValue
+    variable = fp_yy
+    block = 'ANY_BLOCK_ID 1'
   [../]
 []
 
