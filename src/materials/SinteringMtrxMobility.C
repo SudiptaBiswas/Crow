@@ -7,7 +7,7 @@ InputParameters validParams<SinteringMtrxMobility>()
 {
   InputParameters params = validParams<Material>();
   params.addRequiredCoupledVar("c","phase field variable");
-  params.addRequiredCoupledVar("v","array of order parameters");
+  params.addRequiredCoupledVarWithAutoBuild("v", "var_name_base", "op_num", "Array of coupled variables");
   params.addCoupledVar("T", "Temperature variable in Kelvin");
   params.addRequiredParam<Real>("int_width","The interfacial width in the lengthscale of the problem");
   params.addParam<Real>("length_scale", 1.0e-9,"defines the base length scale of the problem in m");
@@ -23,7 +23,6 @@ InputParameters validParams<SinteringMtrxMobility>()
   params.addParam<Real>("Dgb0", 0.4, "Grain Boundary diffusion");
   params.addParam<Real>("Qs", 0, "Surface Diffusion activation energy in eV");
   params.addParam<Real>("Qgb", 0, "GB Diffusion activation energy in eV");
-  params.addRequiredCoupledVar("c", "intermediate parameter--concentration");
   params.addParam<Real>("surfindex", 0.0, "Index for surface diffusion");
   params.addParam<Real>("gbindex", 0.0, "Index for GB diffusion");
   params.addParam<Real>("bulkindex", 1.0, "Index for bulk diffusion");
@@ -136,7 +135,7 @@ SinteringMtrxMobility::computeProperties()
     Real Dbulk = D0_c * std::exp(-_Em/(_kb * _T[_qp]));
     Real phi = 10.0*c*c*c - 15.0*c*c*c*c + 6.0*c*c*c*c*c; // interpolation function
     phi = phi>1.0 ? 1.0 : (phi<0.0 ? 0.0 : phi);
-    Real mult_bulk = 1 - phi;
+    Real mult_bulk = 1.0 - phi;
     Real dmult_bulk = -30.0*c*c + 60.0*c*c*c - 30.0*c*c*c*c;
 
     RealTensorValue Dgb(0.0);

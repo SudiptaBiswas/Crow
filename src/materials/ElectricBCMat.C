@@ -57,18 +57,22 @@ ElectricBCMat::ElectricBCMat(const InputParameters & parameters) :
 void
 ElectricBCMat::computeQpProperties()
 {
-  Real tol = 0.005;
+  Real tol = 0.01;
   RealGradient ns(0);
   RealGradient check(0);
 
   if (_grad_c[_qp].norm() > tol)
     ns = _grad_c[_qp] / _grad_c[_qp].norm();
 
+  //std::cout << "Normal = " << ns << std::endl;
+
   Real gb = 0.0;
   for (unsigned int i = 0; i < _op_num; ++i)
     for (unsigned int j = 0; j < _op_num; ++j)
       if (i != j)
         gb = (*_vals[i])[_qp] * (*_vals[j])[_qp];
+
+   //std::cout << "GB location = " << gb << std::endl;
 
   _gb[_qp] = gb;
 
@@ -84,6 +88,8 @@ ElectricBCMat::computeQpProperties()
       check(i) = 1.0 + ns(i);
   }
   _c_norm[_qp] = check;
+
+  //std::cout << "Check = " << check << std::endl;
 
   switch (_bc_type)
   {
@@ -136,20 +142,25 @@ ElectricBCMat::computeQpProperties()
     for (unsigned int num = 0; num < _boundary_num; ++num)
     {
       if (_boundary_side[num] == "Top")
-        if (ns(1) > 0.0 && check(1) < tol && gb == 0.0)
-          _elec_bc[_qp] = - _top_func.value(_t, _q_point[_qp]);
+        // if (_q_point[_qp](0) > 10.0 && _q_point[_qp](0) < 14.0 && _q_point[_qp](1) > 5.0 && _q_point[_qp](1) < 7.0)
+      if (ns(1) > 0.0 && check(1) < tol && gb < 1e-6)
+        // if (ns(1) > 0.0 && check(1) < tol)
+          _elec_bc[_qp] = -_top_func.value(_t, _q_point[_qp]);
 
       if (_boundary_side[num] == "Bottom")
-        if (ns(1) < 0.0 && check(1) < tol && gb == 0.0)
+        if (ns(1) < 0.0 && check(1) < tol && gb < 1e-6)
+        // if (_q_point[_qp](0) > 10.0 && _q_point[_qp](0) < 14.0 && _q_point[_qp](1) > 5.0 && _q_point[_qp](1) < 7.0)
           _elec_bc[_qp] = -_bottom_func.value(_t, _q_point[_qp]);
 
       if (_boundary_side[num] == "Left")
-        if (ns(0) > 0.0 && check(0) < tol && gb == 0.0)
-          _elec_bc[_qp] = -_left_func.value(_t, _q_point[_qp]);
+        if (ns(0) > 0.0 && check(0) < tol && gb < 1e-6)
+        // if (_q_point[_qp](0) > 10.0 && _q_point[_qp](0) < 14.0 && _q_point[_qp](1) > 5.0 && _q_point[_qp](1) < 7.0)
+            _elec_bc[_qp] = -_left_func.value(_t, _q_point[_qp]);
 
       if (_boundary_side[num] == "Right")
-        if (ns(0) < 0.0 && check(0) < tol && gb == 0.0)
-          _elec_bc[_qp] = -_right_func.value(_t, _q_point[_qp]);
+        if (ns(0) < 0.0 && check(0) < tol && gb < 1e-6)
+        // if (_q_point[_qp](0) > 10.0 && _q_point[_qp](0) < 14.0 && _q_point[_qp](1) > 5.0 && _q_point[_qp](1) < 7.0)
+            _elec_bc[_qp] = -_right_func.value(_t, _q_point[_qp]);
       }
         //_elec_bc[_qp] = - _func.value(_t, _q_point[_qp]);
       break;
@@ -157,4 +168,8 @@ ElectricBCMat::computeQpProperties()
     default:
      mooseError("Incorrect BC type for electric BC material.");
   }
+
+  //std::cout << "ElecBC = " << _elec_bc[_qp] << std::endl;
+
+
 }

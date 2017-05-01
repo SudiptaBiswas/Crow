@@ -19,7 +19,7 @@ public:
   SinteringMobility(const InputParameters & parameters);
 
 protected:
-  virtual void computeQpProperties();
+  virtual void computeProperties();
 
 private:
   const VariableValue & _T;
@@ -28,23 +28,28 @@ private:
   const VariableValue & _c;
   const VariableGradient & _grad_c;
 
+  MaterialProperty<Real> & _D;
+  MaterialProperty<Real> & _dDdc;
   MaterialProperty<Real> & _M;
   MaterialProperty<Real> & _dMdc;
-  MaterialProperty<Real> & _L;
-  MaterialProperty<Real> & _kappa_c;
-  MaterialProperty<Real> & _kappa_op;
-  MaterialProperty<Real> & _A;
-  MaterialProperty<Real> & _B;
-  MaterialProperty<Real> & _time_scale;
-  MaterialProperty<Real> & _energy_scale;
+  // MaterialProperty<Real> & _L;
+  // MaterialProperty<Real> & _kappa_c;
+  // MaterialProperty<Real> & _kappa_op;
+  const MaterialProperty<Real> & _A;
+  const MaterialProperty<Real> & _B;
+  // MaterialProperty<Real> & _time_scale;
+  // MaterialProperty<Real> & _energy_scale;
+
+  Real _time_scale;
+  Real _energy_scale;
 
   Real _int_width;
   Real _length_scale;
   Real _ls;
   Real _D0;
   Real _Em;
-  Real _GB_energy;
-  Real _surface_energy;
+  // Real _GB_energy;
+  // Real _surface_energy;
   Real _GBmob0;
   Real _Q;
   Real _omega;

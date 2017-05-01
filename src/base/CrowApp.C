@@ -65,6 +65,7 @@
 #include "ConservedUniformVoidSource.h"
 
 #include "InterfaceAreaPostprocessor.h"
+#include "NeckAreaPostprocessor.h"
 // #include "ConservationCheck.h"
 
 //#include "MobilityFn.h"
@@ -175,6 +176,7 @@ CrowApp::registerObjects(Factory & factory)
   //registerFunction(MobilityFn);
   registerAux(RandomVoidSourceAux);
   registerPostprocessor(InterfaceAreaPostprocessor);
+  registerPostprocessor(NeckAreaPostprocessor);
   // registerPostprocessor(ConservationCheck);
 
   registerUserObject(ConservedUniformVoidSource);
