@@ -127,7 +127,7 @@
     type = GenericConstantMaterial
     block = 0
     prop_names = '  A    B   L   kappa_op kappa_c '
-    prop_values = '16.0 1.0 1.0  0.5      1.0     '
+    prop_values = '16.0 1.0 1.0  0.5     1.0     '
   [../]
 []
 

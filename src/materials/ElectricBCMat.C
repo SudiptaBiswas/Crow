@@ -110,13 +110,13 @@ ElectricBCMat::computeQpProperties()
             _delec_bc[_qp] = 1.0;
           }
         if (_boundary_side[num] == "Left")
-          if (ns(0) > 0.0 && check(0) < tol && gb == 0.0)
+          if (ns(0) > 0.0 && check(0) < tol && gb < 1e-6)
           {
             _elec_bc[_qp] = _elec[_qp] - _left_func.value(_t, _q_point[_qp]);
             _delec_bc[_qp] = 1.0;
           }
         if (_boundary_side[num] == "Right")
-          if (ns(0) < 0.0 && check(0) < tol && gb == 0.0)
+          if (ns(0) < 0.0 && check(0) < tol && gb < 1e-6)
           {
             _elec_bc[_qp] = _elec[_qp] - _right_func.value(_t, _q_point[_qp]);
             _delec_bc[_qp] = 1.0;

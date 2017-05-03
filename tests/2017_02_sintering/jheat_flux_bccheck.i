@@ -213,13 +213,13 @@
     type = NeumannBC
     variable = elec
     boundary = left
-    value = 0.1
+    value = 2.0
   [../]
   [./elec_right]
     type = NeumannBC
     variable = elec
     boundary = right
-    value = -0.1
+    value = -1.0
   [../]
   #[./elec_right]
   #  type = CahnHilliardFluxBC
@@ -277,18 +277,18 @@
   [../]
   [./constant_mat]
     type = GenericConstantMaterial
-    prop_names = '  therm_cond_phase1   density_phase1  spcfc_ht_phase1  A     B   kappa_op  kappa_c   L '
-    prop_values = '      10.0            10.0              0.01           16.0  1.0  0.5      1.0      1.0'
+    prop_names = '  phase1_electrical_conductivity therm_cond_phase1   density_phase1  spcfc_ht_phase1  A     B   kappa_op  kappa_c   L '
+    prop_values = '     5.0                             10.0            10.0              0.01           16.0  1.0  1.0      10.0      1.0'
   [../]
-  [./sigma]
-    type = ElectricalConductivity
-    temp = T
-    ref_temp = 1000
-    ref_resistivity = 0.0054
-    temp_coeff = 0.0048
-    #length_scale = 1e-08
-    base_name = phase1
-  [../]
+  #[./sigma]
+  #  type = ElectricalConductivity
+  #  temp = T
+  #  ref_temp = 1000
+  #  ref_resistivity = 0.0054
+  #  temp_coeff = 0.0048
+  #  #length_scale = 1e-08
+  #  base_name = phase1
+  #[../]
   #[./elec_bc]
   #  type = ElectricBCMat
   #  elec = elec
@@ -463,7 +463,7 @@
   print_perf_log = true
   csv = true
   gnuplot = true
-  file_base = flux_check
+  #file_base = flux_check
   [./exodus]
     type = Exodus
     elemental_as_nodal = true

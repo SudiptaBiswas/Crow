@@ -1,3 +1,8 @@
+[GlobalParams]
+  block = '0 1'
+[]
+
+
 [Mesh]
   type = GeneratedMesh
   dim = 2
@@ -5,6 +10,22 @@
   ny = 20
   xmax = 20
   ymax = 10
+  uniform_refine = 2
+[]
+
+[MeshModifiers]
+  [./subdomain1]
+    type = SubdomainBoundingBox
+    bottom_left = '0.0 0.0 0.0'
+    top_right = '2.0 10.0 0.0'
+    block_id = 1
+  [../]
+  #[./subdomain2]
+  #  type = SubdomainBoundingBox
+  #  bottom_left = '330 0 0'
+  #  top_right = '350 200 0'
+  #  block_id = 2
+  #[../]
 []
 
 [Variables]
@@ -28,10 +49,16 @@
   [../]
   #[./heatsource]
   #  type = HeatSource
-  #  #block = 0
+  #  block = 1
   #  function = volumetric_heat
   #  variable = T
   #[../]
+  [./elec_source]
+    type = HeatSource
+    block = 1
+    function = volumetric_heat1
+    variable = elec
+  [../]
   [./HeatSrc]
     type = JouleHeatingSource
     variable = T
@@ -44,8 +71,9 @@
     args = 'T'
   [../]
   [./elec_dot]
-    type = TimeDerivative
+    type = CoefTimeDerivative
     variable = elec
+    Coefficient = 0.1
   [../]
 []
 
@@ -57,6 +85,8 @@
   [./grade_y]
     order = CONSTANT
     family = MONOMIAL
+  [../]
+  [./c]
   [../]
 []
 
@@ -78,15 +108,25 @@
 [Functions]
   [./volumetric_heat]
      type = ParsedFunction
-     value = 50.0
+     value = 5.0
+  [../]
+  [./volumetric_heat1]
+     type = ParsedFunction
+     value = 0.5
   [../]
 []
 
 [ICs]
-  #[./T]
-  #  type = RandomIC
-  #  variable = T
-  #[../]
+  [./c]
+    type = SmoothCircleIC
+    variable = c
+    invalue = 0.0
+    outvalue = 1.0
+    x1 = 5.0
+    y1 = 5.0
+    radius = 3.0
+    int_width = 0.8
+  [../]
   #[./elec]
   #  type = RandomIC
   #  variable = elec
@@ -101,12 +141,12 @@
   #  variable = T
   #  value = 300
   #[../]
-  [./elec_left]
-    type = NeumannBC
-    variable = elec
-    boundary = left
-    value = 5.0
-  [../]
+  #[./elec_left]
+  #  type = DirichletBC
+  #  variable = elec
+  #  boundary = left
+  #  value = 0.5
+  #[../]
   #[./elec_right]
   #  type = NeumannBC
   #  variable = elec
@@ -144,19 +184,19 @@
   #  prop_values = '0.092' #copper in cal/(g C)
   #  block = 0
   #[../]
-  [./heatcond]
-    type = HeatConductionMaterial
-    block = 0
-    thermal_conductivity = 0.8
-    specific_heat = 0.01
-    outputs = exodus
-  [../]
-  [./density]
-    type = Density
-    block = 0
-    density = 10.0
-    outputs = exodus
-  [../]
+  #[./heatcond]
+  #  type = HeatConductionMaterial
+  #  block = 0
+  #  thermal_conductivity = 0.08
+  #  specific_heat = 0.01
+  #  outputs = exodus
+  #[../]
+  #[./density]
+  #  type = Density
+  #  block = 0
+  #  density = 10.0
+  #  outputs = exodus
+  #[../]
   #[./rho]
   #  type = GenericConstantMaterial
   #  prop_names = 'density'
@@ -170,8 +210,105 @@
     ref_resistivity = 0.0168
     temp_coeff = 0.00386
     length_scale = 1.0
+    base_name = phase1
     outputs = exodus
     output_properties = 'electrical_conductivity'
+  [../]
+  [./constant_mat]
+    type = GenericConstantMaterial
+    prop_names = '  therm_cond_phase1   density_phase1  spcfc_ht_phase1 '
+    prop_values = '      0.08           10.0              0.01    '
+  [../]
+  #[./elec_bc]
+  #  type = ElectricBCMat
+  #  elec = elec
+  #  c = c
+  #  bc_type = Neumann
+  #  left_function = volumetric_heat
+  #  right_function = volumetric_heat1
+  #  #top_function = volumetric_heat
+  #  #bottom_function = volumetric_heat1
+  #  boundary_side = 'Left Right'
+  #  outputs = exodus
+  #[../]
+  [./switching]
+    type = DerivativeParsedMaterial
+    f_name = h
+    args = c
+    function = 'c'
+  [../]
+
+  [./therm_cond]
+    type = DerivativeTwoPhaseMaterial
+    W = 0
+    eta = c
+    args = 'T'
+    f_name = thermal_conductivity
+    fa_name = 1e-14
+    fb_name = therm_cond_phase1
+    g = 0.0
+    #h = 0.8
+    outputs = exodus
+    derivative_order = 2
+  [../]
+
+  [./elec_cond]
+    type = DerivativeTwoPhaseMaterial
+    W = 0
+    eta = c
+    args = 'T'
+    f_name = electrical_conductivity
+    fa_name = 1e-14
+    fb_name = phase1_electrical_conductivity
+    g = 0.0
+    #h = 0.8
+    outputs = exodus
+    derivative_order = 2
+  [../]
+  [./dens]
+    type = DerivativeTwoPhaseMaterial
+    W = 0
+    eta = c
+    args = 'T'
+    f_name = density
+    fa_name = 1e-14
+    fb_name = density_phase1
+    g = 0.0
+    #h = 0.8
+    outputs = exodus
+    derivative_order = 2
+  [../]
+  [./spcfc_ht]
+    type = DerivativeTwoPhaseMaterial
+    W = 0
+    eta = c
+    args = 'T'
+    f_name = specific_heat
+    fa_name = 1e-4
+    fb_name = spcfc_ht_phase1
+    g = 0.0
+    #h = 0.8
+    outputs = exodus
+    derivative_order = 2
+  [../]
+  [./grad_elc]
+    type = VariableGradientMaterial
+    prop = grad_elc
+    variable = elec
+  [../]
+  [./current]
+    type = DerivativeParsedMaterial
+    material_property_names = 'electrical_conductivity grad_elc'
+    f_name = current_prop
+    function = 'electrical_conductivity*grad_elc'
+    outputs = exodus
+  [../]
+  [./joule_heat]
+    type = DerivativeParsedMaterial
+    material_property_names = 'electrical_conductivity grad_elc'
+    f_name = joule_heat
+    function = 'electrical_conductivity*grad_elc*grad_elc'
+    outputs = exodus
   [../]
 []
 

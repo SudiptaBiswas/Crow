@@ -10,29 +10,29 @@
   nx = 80
   ny = 40
   nz = 0
-  xmin = 1.9
-  xmax = 32.8
+  xmin = 0
+  xmax = 35.0
   ymin = 0.0
   ymax = 20.0
   zmax = 0
   #uniform_refine = 2
   elem_type = QUAD4
 []
-#
-#[MeshModifiers]
-#  [./subdomain1]
-#    type = SubdomainBoundingBox
-#    bottom_left = '0 0 0'
-#    top_right = '20 200 0'
-#    block_id = 1
-#  [../]
-#  [./subdomain2]
-#    type = SubdomainBoundingBox
-#    bottom_left = '330 0 0'
-#    top_right = '350 200 0'
-#    block_id = 2
-#  [../]
-#[]
+
+[MeshModifiers]
+  [./subdomain1]
+    type = SubdomainBoundingBox
+    bottom_left = '0.0 0.0 0.0'
+    top_right = '1.9 20.0 0.0'
+    block_id = 1
+  [../]
+  [./subdomain2]
+    type = SubdomainBoundingBox
+    bottom_left = '32.8 0.0 0.0 '
+    top_right = '35.0 20.0 0.0'
+    block_id = 2
+  [../]
+[]
 
 [Variables]
   [./c]
@@ -127,6 +127,14 @@
     args = 'T c'
     block = 0
   [../]
+  [./Elecdot]
+    type = TimeDerivative
+    variable = elec
+  [../]
+  #[./electric_bc]
+  #  type = ElectricBCKernel
+  #  variable = elec
+  #[../]
   #[./elec_1]
   #  type = BodyForce
   #  value = 0.1
@@ -156,29 +164,39 @@
   #  boundary = right
   #  value = 1e-11
   #[../]
+  #[./elec_left]
+  #  type = NeumannBC
+  #  variable = elec
+  #  boundary = left
+  #  value = -1.0
+  #[../]
+  #[./elec_left]
+  #  type = CahnHilliardFluxBC
+  #  variable = elec
+  #  boundary = left
+  #  flux = '-1.0 0.0 0.0'
+  #  args = 'c T'
+  #  mob_name = electrical_conductivity
+  #  #value = -1.0
+  #[../]
   [./elec_left]
     type = DirichletBC
     variable = elec
     boundary = left
-    value = 0.2
+    value = 1.0
   [../]
-  #[./elec_right]
-  #  type = DirichletBC
-  #  variable = elec
-  #  boundary = right
-  #  value = 0
-  #[../]
 []
 
-#[Functions]
-#  [./switch]
-#    type = ParsedFunction
-#    from_variable = c
-#    solution = c
-#
-#    value ='c+1e-6'
-#  [../]
-#[]
+[Functions]
+  [./volumetric_heat]
+     type = ParsedFunction
+     value = -1.0
+  [../]
+  [./volumetric_heat1]
+     type = ParsedFunction
+     value = 5.0
+  [../]
+[]
 
 [AuxKernels]
   [./bnds]
@@ -234,8 +252,8 @@
   [./constant_mat]
     type = GenericConstantMaterial
 
-    prop_names = '  A         B       kappa_op    kappa_c L'
-    prop_values = '16.0   1.0  0.5  1.0 1.0'
+    prop_names = '  A      B  kappa_op kappa_c L'
+    prop_values = '5.0   2.0  10.0     10.0    10.0'
     #prop_names = '  A    B  '
     #prop_values = '16.0 1.0 '
   [../]
@@ -275,21 +293,21 @@
   #[../]
   [./k]
     type = ParsedMaterial
-    f_name = thermal_conductivity
+    f_name = thermal_conductivity_phase1
     function = '173e-9' #copper in W/(cm sec K)
     #function = '0.95' #copper in W/(cm sec K)
 
   [../]
   [./cp]
     type = ParsedMaterial
-    f_name = specific_heat
+    f_name = specific_heat_phase1
     #function = '0.143*6.24150974e18' #copper in ev/(g K)
     function = '0.092' #copper in ev/(g K)
 
   [../]
   [./rho]
     type = GenericConstantMaterial
-    prop_names = 'density'
+    prop_names = 'density_phase1'
     #prop_values = '19.25e-21' #copper in g/(nm^3)
     prop_values = '8.96' #copper in g/(nm^3)
 
@@ -343,6 +361,57 @@
     outputs = exodus
     derivative_order = 2
   [../]
+  [./therm_cond]
+    type = DerivativeTwoPhaseMaterial
+    W = 0
+    eta = c
+    args = 'T'
+    f_name = thermal_conductivity
+    fa_name = 1e-6
+    fb_name = thermal_conductivity_phase1
+    g = 0.0
+    #h = 0.8
+    outputs = exodus
+    derivative_order = 2
+  [../]
+  [./dens]
+    type = DerivativeTwoPhaseMaterial
+    W = 0
+    eta = c
+    args = 'T'
+    f_name = density
+    fa_name = 1e-6
+    fb_name = density_phase1
+    g = 0.0
+    #h = 0.8
+    outputs = exodus
+    derivative_order = 2
+  [../]
+  [./spcf]
+    type = DerivativeTwoPhaseMaterial
+    W = 0
+    eta = c
+    args = 'T'
+    f_name = specific_heat
+    fa_name = 1e-6
+    fb_name = specific_heat_phase1
+    g = 0.0
+    #h = 0.8
+    outputs = exodus
+    derivative_order = 2
+  [../]
+  #[./elec_bc]
+  #  type = ElectricBCMat
+  #  elec = elec
+  #  c = c
+  #  bc_type = Dirichlet
+  #  left_function = volumetric_heat1
+  #  right_function = volumetric_heat
+  #  #top_function = volumetric_heat1
+  #  #bottom_function = volumetric_heat1
+  #  boundary_side = 'Left Right'
+  #  outputs = exodus
+  #[../]
   [./grad_elc]
     type = VariableGradientMaterial
     prop = grad_elc
@@ -496,8 +565,6 @@
   csv = true
   gnuplot = true
   print_perf_log = true
-  #interval = 10
-  #file_base = 2016_12_16_2p_elect
   [./exodus]
     type = Exodus
     elemental_as_nodal = true
