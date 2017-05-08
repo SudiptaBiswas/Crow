@@ -126,44 +126,28 @@
     derivative_order = 2
     #outputs = console
   [../]
-  #[./CH_mat]
-  #  type = PFDiffusionGrowth
-  #  block = 0
-  #  rho = c
-  #  v = 'gr0 gr1'
-  #  outputs = console
+  [./CH_mat]
+    type = PFDiffusionGrowth
+    block = 0
+    rho = c
+    v = 'gr0 gr1'
+    outputs = console
+  [../]
+  #[./constant_mat]
+  #  type = GenericConstantMaterial
+  #
+  #  prop_names = '  A         B       kappa_op    kappa_c  L '
+  #  prop_values = ' 5.0     10.0        10          10.0  10.0 '
+  #  #prop_names = '  A    B  '
+  #  #prop_values = '16.0 1.0 '
   #[../]
   [./constant_mat]
     type = GenericConstantMaterial
-
-    prop_names = '  A         B       kappa_op    kappa_c  L '
-    prop_values = ' 5.0     10.0        10.0          10.0  10.0 '
+    block = 0
+    prop_names = '  A    B     kappa_op  kappa_c  L'
+    prop_values = '8.5   0.5   1.5       1.5     10.0'
     #prop_names = '  A    B  '
     #prop_values = '16.0 1.0 '
-  [../]
-  [./mob]
-    type = SinteringMobility
-    T = 1200.0
-    int_width = 2
-    #GB_energy = 6.86
-    #surface_energy = 9.33
-    GBmob0 = 3.986e-6
-    Qv = 2.0
-    Qgb = 4.143
-    Qs = 3.14
-    Qgbm = 0.94
-    Dgb0 = 4.0e-4
-    Dsurf0 = 1.41e-5
-    Dvap0 = 4.0e-6
-    Dvol0 = 4.0e-6
-    c = c
-    v = 'gr0 gr1'
-    Vm = 1.5829e-29
-    length_scale = 1e-08
-    time_scale = 1e-4
-    bulkindex = 1.0
-    surfindex = 1.0
-    gbindex = 1.0
   [../]
 []
 
@@ -227,7 +211,8 @@
   scheme = BDF2
   solve_type = NEWTON
   petsc_options_iname = '-pc_type -ksp_grmres_restart -sub_ksp_type -sub_pc_type -pc_asm_overlap'
-  petsc_options_value = 'asm         31   preonly   lu      1'
+  petsc_options_value = 'asm         31   preonly   ilu      1'
+  #petsc_options = '-ksp_converged_reason -snes_converged_reason'
   l_max_its = 20
   nl_max_its = 20
   nl_abs_tol = 1e-10

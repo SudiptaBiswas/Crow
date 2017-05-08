@@ -1,4 +1,5 @@
 #include "Mobility.h"
+#include "MooseVariable.h"
 
 template<>
 InputParameters validParams<Mobility>()

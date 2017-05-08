@@ -137,7 +137,7 @@
     type = GenericConstantMaterial
 
     prop_names = '  A         B       kappa_op    kappa_c  L '
-    prop_values = ' 5.0     10.0        10.0          10.0  10.0 '
+    prop_values = ' 2.5       0.5        1.5          1.5  1.0 '
     #prop_names = '  A    B  '
     #prop_values = '16.0 1.0 '
   [../]
@@ -160,10 +160,11 @@
     v = 'gr0 gr1'
     Vm = 1.5829e-29
     length_scale = 1e-08
-    time_scale = 1e-4
+    time_scale = 1e-3
     bulkindex = 1.0
     surfindex = 1.0
     gbindex = 1.0
+    outputs = exodus
   [../]
 []
 
@@ -266,6 +267,7 @@
   csv = true
   gnuplot = true
   print_perf_log = true
+  file_base = sintmob_gbn1_sn1
   [./console]
     type = Console
     perf_log = true

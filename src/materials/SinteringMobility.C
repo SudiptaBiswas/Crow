@@ -15,7 +15,8 @@ InputParameters validParams<SinteringMobility>()
   params.addParam<Real>("ls", 1.0e-9,"Surface layer thickness in m");
   params.addParam<Real>("Dvol0", 0.01, "Volumetric diffusion coefficient ");
   params.addParam<Real>("Dvap0", 0.001, "Vapor Diffusion ");
-  params.addRequiredParam<Real>("Qv", "Vacancy migration energy in eV");
+  params.addParam<Real>("Qv", 1.0, "Vacancy migration energy in eV");
+  params.addParam<Real>("Qvc", 1.0, "Vacancy migration energy in eV");
   // params.addRequiredParam<Real>("D0", "Diffusivity prefactor for vacancies in m^2/s");
   // params.addRequiredParam<Real>("Em", "Vacancy migration energy in eV");
   // params.addRequiredParam<Real>("GB_energy", "GB energy in J/m2");
@@ -42,14 +43,12 @@ SinteringMobility::SinteringMobility(const InputParameters & parameters) :
     _c(coupledValue("c")),
     _grad_c(coupledGradient("c")),
     _D(declareProperty<Real>("D")),
+    _Dbulk(declareProperty<Real>("Dbulk")),
+    _Dsurf(declareProperty<Real>("Dsurf")),
+    _Dgb(declareProperty<Real>("Dgb")),
     _dDdc(declareProperty<Real>("dDdc")),
     _M(declareProperty<Real>("M")),
     _dMdc(declareProperty<Real>("dMdc")),
-    // _L(declareProperty<Real>("L")),
-    // _kappa_c(declareProperty<Real>("kappa_c")),
-    // _kappa_op(declareProperty<Real>("kappa_op")),
-    // _A(declareProperty<Real>("A")),
-    // _B(declareProperty<Real>("B")),
     _A(getMaterialProperty<Real>("A")),
     _B(getMaterialProperty<Real>("B")),
     _time_scale(getParam<Real>("time_scale")),
@@ -59,6 +58,8 @@ SinteringMobility::SinteringMobility(const InputParameters & parameters) :
     _ls(getParam<Real>("ls")),
     _D0(getParam<Real>("Dvol0")),
     _Em(getParam<Real>("Qv")),
+    _Dv0(getParam<Real>("Dvap0")),
+    _Qvc(getParam<Real>("Qvc")),
     // _GB_energy(getParam<Real>("GB_energy")),
     // _surface_energy(getParam<Real>("surface_energy")),
     _GBmob0(getParam<Real>("GBmob0")),
@@ -94,101 +95,77 @@ SinteringMobility::SinteringMobility(const InputParameters & parameters) :
 void
 SinteringMobility::computeProperties()
 {
-  // for (_qp = 0; _qp < _qrule->n_points(); ++_qp)
-  // {
-    /* the model parameters will be non-dimensionalized for convenience and consistency
-     * in calculating the different residuals (Rc and Rw). However, the physical values
-     * of the model parameters can be obtained by converting them back to their physical
-     * dimensions using the length, time, and energy scales
+  const Real D0_c = _D0 * _time_scale / (_length_scale * _length_scale); // Non-dimensionalized Bulk Diffusivity prefactor
+  const Real Dv0_c = _Dv0 * _time_scale / (_length_scale * _length_scale); // Non-dimensionalized Bulk Diffusivity prefactor
+  const Real Dgb0_c = _Dgb0 * _time_scale / (_length_scale * _length_scale); // Non-dimensionalized GB Diffusivity prefactor
+  const Real Ds0_c = _Ds0 * _time_scale / (_length_scale * _length_scale); // Non-dimensionalized Surface Diffusivity prefactor
+  const Real GBmob0_c = _GBmob0 * _time_scale / (_JtoeV * (_length_scale*_length_scale*_length_scale*_length_scale)); // Convert to lengthscale^4/(eV*timescale);
+  const Real omega = _omega / (_length_scale * _length_scale * _length_scale); // omega/kT in m^3/J
+
+  for (_qp = 0; _qp < _qrule->n_points(); ++_qp)
+  {
+    Real c = _c[_qp];
+    c = c>1.0 ? 1.0 : (c<0.0 ? 0.0 : c);
+    Real mc = 1.0 - c;
+    /* The equilibrium values at a curved surface is higher/lower than the
+     * corresponding ones at a flat surface due to Gibbs-Thompson condition.
+     * This could affect the sign of the mobility function and/or its derivative,
+     * so we must avoid that
      */
-    // _energy_scale[_qp] = _GB_energy/_length_scale; // energy density scale in J/m^3
-    Real int_width_c = _int_width; // The interfacial width is input in the length scale of the problem, so no conversion is necessary
-    // Real GB_energy = _GB_energy/(_energy_scale[_qp]*_length_scale); // Non-dimensionalized GB energy
-    // Real surface_energy = _surface_energy/(_energy_scale[_qp]*_length_scale); //Non-dimensionalized surface energy
-    //
-    // // Energetic parameters
-    // _kappa_c[_qp] =  3.0/4.0 * (2.0 * surface_energy - GB_energy) * int_width_c;
-    // _kappa_op[_qp] = 3.0/4.0* GB_energy * int_width_c;
-    // _A[_qp] = (12.0 * surface_energy - 7.0 * GB_energy) / int_width_c;
-    // _B[_qp] = GB_energy / int_width_c;
 
-    // Kinetic parameters
-    // Real GBmob;
-    // if (_GBMobility < 0)
-    //   GBmob = _GBmob0 * std::exp(-_Q / (_kb * _T[_qp]));
-    // else
-    //   GBmob = _GBMobility; // GBMobility in m^4/(J*s)
-    // _time_scale[_qp] = (_length_scale * _length_scale)/(GBmob * _GB_energy); // time scale in s
-    const Real D0_c = _D0 * _time_scale / (_length_scale * _length_scale); // Non-dimensionalized Bulk Diffusivity prefactor
-    const Real Dgb0_c = _Dgb0 * _time_scale / (_length_scale * _length_scale); // Non-dimensionalized GB Diffusivity prefactor
-    const Real Ds0_c = _Ds0 * _time_scale / (_length_scale * _length_scale); // Non-dimensionalized Surface Diffusivity prefactor
-    const Real GBmob0_c = _GBmob0 * _time_scale / (_JtoeV * (_length_scale*_length_scale*_length_scale*_length_scale)); // Convert to lengthscale^4/(eV*timescale);
-    const Real omega = _omega / (_length_scale * _length_scale * _length_scale); // omega/kT in m^3/J
-    // _L[_qp] = 4.0/3.0 * GB_M / int_width_c; // Non-dimensionalized Allen-Cahn Mobility
+    // Compute bulk Diffusivity (bulk diffusion is turned on by default)
+    Real Dbulk = D0_c * std::exp(-_Em/(_kb * _T[_qp]));
+    Real Dvap = Dv0_c * std::exp(-_Qvc/(_kb * _T[_qp]));
+    Real phi = 10.0*c*c*c - 15.0*c*c*c*c + 6.0*c*c*c*c*c; // interpolation function
+    phi = phi>1.0 ? 1.0 : (phi<0.0 ? 0.0 : phi);
+    Real mult_bulk = 1.0 - phi;
+    Real dmult_bulk = -30.0*c*c + 60.0*c*c*c - 30.0*c*c*c*c;
 
-    for (_qp = 0; _qp < _qrule->n_points(); ++_qp)
+    Real Dgb(0.0);
+    if (_gbindex > 0.0) // compute only when GB diffusion is turned on
     {
-      Real c = _c[_qp];
-      c = c>1.0 ? 1.0 : (c<0.0 ? 0.0 : c);
-      Real mc = 1.0 - c;
-      /* The equilibrium values at a curved surface is higher/lower than the
-       * corresponding ones at a flat surface due to Gibbs-Thompson condition.
-       * This could affect the sign of the mobility function and/or its derivative,
-       * so we must avoid that
-       */
+      Real D_GB = Dgb0_c * std::exp(-_Qgb/(_kb * _T[_qp]));
+      for (unsigned int i = 0; i < _ncrys; ++i)
+        for (unsigned int j = 0; j < _ncrys; ++j)
+        {
+          if (i != j)
+            Dgb += D_GB * (*_vals[i])[_qp] * (*_vals[j])[_qp];
+        }
+    }
+    // Compute surface diffusivity matrix
+    Real Dsurf(0.0);
+    Real mult_surf(0.0);
+    Real dmult_surf(0.0);
+    if (_surfindex > 0.0) // compute only when surface diffusion is turned on
+    {
+      Dsurf = Ds0_c * std::exp(-_Qs/(_kb * _T[_qp]));
+      mult_surf = 30 * (c*c * mc*mc);
+      dmult_surf = 30 * (2.0*c*mc*mc - 2.0*c*c*mc);
+    }
 
-      // Compute bulk Diffusivity (bulk diffusion is turned on by default)
-      Real Dbulk = D0_c * std::exp(-_Em/(_kb * _T[_qp]));
-      Real phi = 10.0*c*c*c - 15.0*c*c*c*c + 6.0*c*c*c*c*c; // interpolation function
-      phi = phi>1.0 ? 1.0 : (phi<0.0 ? 0.0 : phi);
-      Real mult_bulk = 1.0 - phi;
-      Real dmult_bulk = -30.0*c*c + 60.0*c*c*c - 30.0*c*c*c*c;
+    // Compute different mobility tensors and their derivatives
+    Real d2F =  12.0 * _A[_qp] * c * c - 12.0 * _A[_qp] * c + 2.0 * (_A[_qp] + _B[_qp]);
+    Real Mbulk = Dbulk * phi;
+    Real dMbulkdc = -Dbulk * dmult_bulk;
+    Real Mvap = Dvap * mult_bulk;
+    Real dMvapdc = Dvap * dmult_bulk;
+    Real Msurf = Dsurf * mult_surf;
+    Real dMsurfdc = Dsurf * dmult_surf;
+    // Real omega_kT = _omega / (_kb * _T[_qp])*_JtoeV; // omega/kT in m^3/J
+    // Real Mbulk = Dbulk * mult_bulk * omega_kT * _energy_scale[_qp];
+    // Real dMbulkdc = Dbulk * dmult_bulk * omega_kT * _energy_scale[_qp];
+    // Real Msurf = 2.0/3.0*Dsurf*mult_surf*omega_kT*_energy_scale[_qp]*_ls/(int_width_c*_length_scale);
+    // Real dMsurfdc = 2.0/3.0*Dsurf*dmult_surf*omega_kT*_energy_scale[_qp]*_ls/(int_width_c*_length_scale);
+    // Real Mgb = Dgb* omega_kT * _energy_scale[_qp];
 
-      Real Dgb(0.0);
-      if (_gbindex > 0.0) // compute only when GB diffusion is turned on
-      {
-        Real D_GB = Dgb0_c * std::exp(-_Qgb/(_kb * _T[_qp]));
-        for (unsigned int i = 0; i < _ncrys; ++i)
-          for (unsigned int j = 0; j < _ncrys; ++j)
-          {
-            if (i != j)
-              Dgb += D_GB * (*_vals[i])[_qp] * (*_vals[j])[_qp];
-          }
-      }
-      // Compute surface diffusivity matrix
-      Real Dsurf(0.0);
-      Real mult_surf(0.0);
-      Real dmult_surf(0.0);
-      if (_surfindex > 0.0) // compute only when surface diffusion is turned on
-      {
-        /* Adding small positive values on the diagonal makes the projection tensor
-         * non-negative everywhere in the domain
-         */
-        Dsurf = Ds0_c * std::exp(-_Qs/(_kb * _T[_qp]));
-        mult_surf = (c * mc);
-        dmult_surf = (1 - 2.0*c);
-      }
+    // Compute the total mobility tensor and its derivative
+    _Dbulk[_qp] = _bulkindex * Mvap + _bulkindex * Mbulk;
+    _Dsurf[_qp] = _surfindex * Msurf;
+    _Dgb[_qp] = _gbindex * Dgb;
+    _D[_qp] = (_Dbulk[_qp] + _Dgb[_qp] + _Dsurf[_qp]);
+    _dDdc[_qp] = (_bulkindex * dMbulkdc + _bulkindex * dMvapdc + _surfindex * dMsurfdc);
 
-      // Compute different mobility tensors and their derivatives
-      Real d2F =  12.0 * _A[_qp] * c * c - 12.0 * _A[_qp] * c + 2.0 * (_A[_qp] + _B[_qp]);
-      Real Mbulk = Dbulk * mult_bulk;
-      Real dMbulkdc = Dbulk * dmult_bulk;
-      Real Msurf = Dsurf * mult_surf;
-      Real dMsurfdc = Dsurf * dmult_surf;
-      // Real omega_kT = _omega / (_kb * _T[_qp])*_JtoeV; // omega/kT in m^3/J
-      // Real Mbulk = Dbulk * mult_bulk * omega_kT * _energy_scale[_qp];
-      // Real dMbulkdc = Dbulk * dmult_bulk * omega_kT * _energy_scale[_qp];
-      // Real Msurf = 2.0/3.0*Dsurf*mult_surf*omega_kT*_energy_scale[_qp]*_ls/(int_width_c*_length_scale);
-      // Real dMsurfdc = 2.0/3.0*Dsurf*dmult_surf*omega_kT*_energy_scale[_qp]*_ls/(int_width_c*_length_scale);
-      // Real Mgb = Dgb* omega_kT * _energy_scale[_qp];
-
-      // Compute the total mobility tensor and its derivative
-      _D[_qp] = (_bulkindex * Mbulk  + _gbindex * Dgb + _surfindex * Msurf);
-      _dDdc[_qp] = (_bulkindex * dMbulkdc + _surfindex * dMsurfdc);
-      _M[_qp] = (_bulkindex * Mbulk  + _gbindex * Dgb + _surfindex * Msurf) * omega / d2F;
-      _dMdc[_qp] = (_bulkindex * dMbulkdc + _surfindex * dMsurfdc) * omega / d2F;
-      // // Compute the mobility determinant
-      // _detM[_qp] = _M[_qp].det(); // to make sure it is non-negative anywhere in the domain
-
+    _M[_qp] = _D[_qp] * omega / d2F;
+    _dMdc[_qp] = _dDdc[_qp] * omega / d2F;
   }
 }

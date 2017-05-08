@@ -137,7 +137,7 @@
     type = GenericConstantMaterial
 
     prop_names = '  A         B       kappa_op    kappa_c  L '
-    prop_values = ' 5.0     10.0        10.0          10.0  10.0 '
+    prop_values = ' 16.0       1.0        1.5          1.5  1.0 '
     #prop_names = '  A    B  '
     #prop_values = '16.0 1.0 '
   [../]
@@ -152,66 +152,67 @@
     Qgb = 4.143
     Qs = 3.14
     Qgbm = 0.94
-    Dgb0 = 4.0e-4
-    Dsurf0 = 1.41e-5
-    Dvap0 = 4.0e-6
-    Dvol0 = 4.0e-6
+    #Dgb0 = 4.0e-4
+    #Dsurf0 = 1.41e-3
+    #Dvap0 = 4.0e-5
+    #Dvol0 = 4.0e-6
     c = c
     v = 'gr0 gr1'
     Vm = 1.5829e-29
-    length_scale = 1e-08
-    time_scale = 1e-4
+    length_scale = 1
+    time_scale = 1
     bulkindex = 1.0
     surfindex = 1.0
     gbindex = 1.0
+    outputs = exodus
   [../]
 []
 
-[Postprocessors]
-  [./elem_c]
-    type = ElementIntegralVariablePostprocessor
-    variable = c
-  [../]
-  [./elem_bnds]
-    type = ElementIntegralVariablePostprocessor
-    variable = bnds
-  [../]
-  [./total_energy]
-    type = ElementIntegralVariablePostprocessor
-    variable = total_en
-  [../]
-  [./free_en]
-    type = ElementIntegralMaterialProperty
-    mat_prop = F
-  [../]
-  [./dofs]
-    type = NumDOFs
-  [../]
-  [./tstep]
-    type = TimestepSize
-  [../]
-  [./run_time]
-    type = RunTime
-    time_type = active
-  [../]
-  [./int_area]
-    type = InterfaceAreaPostprocessor
-    variable = c
-  [../]
-  [./grain_size_gr0]
-    type = ElementIntegralVariablePostprocessor
-    variable = gr0
-  [../]
-  [./grain_size_gr1]
-    type = ElementIntegralVariablePostprocessor
-    variable = gr1
-  [../]
-  [./gb_area]
-    type = GrainBoundaryArea
-  [../]
-  [./neck]
-    type = NeckAreaPostprocessor
-  [../]
+#[Postprocessors]
+#  [./elem_c]
+#    type = ElementIntegralVariablePostprocessor
+#    variable = c
+#  [../]
+#  [./elem_bnds]
+#    type = ElementIntegralVariablePostprocessor
+#    variable = bnds
+#  [../]
+#  [./total_energy]
+#    type = ElementIntegralVariablePostprocessor
+#    variable = total_en
+#  [../]
+#  [./free_en]
+#    type = ElementIntegralMaterialProperty
+#    mat_prop = F
+#  [../]
+#  [./dofs]
+#    type = NumDOFs
+#  [../]
+#  [./tstep]
+#    type = TimestepSize
+#  [../]
+#  [./run_time]
+#    type = RunTime
+#    time_type = active
+#  [../]
+#  [./int_area]
+#    type = InterfaceAreaPostprocessor
+#    variable = c
+#  [../]
+#  [./grain_size_gr0]
+#    type = ElementIntegralVariablePostprocessor
+#    variable = gr0
+#  [../]
+#  [./grain_size_gr1]
+#    type = ElementIntegralVariablePostprocessor
+#    variable = gr1
+#  [../]
+#  [./gb_area]
+#    type = GrainBoundaryArea
+#  [../]
+#  [./neck]
+#    type = NeckAreaPostprocessor
+#  [../]
 []
 
 [Preconditioning]
@@ -242,24 +243,24 @@
   [../]
 []
 
-[Adaptivity]
-  marker = bound_adapt
-  max_h_level = 2
-  [./Indicators]
-    [./error]
-      type = GradientJumpIndicator
-      variable = bnds
-    [../]
-  [../]
-  [./Markers]
-    [./bound_adapt]
-      type = ValueRangeMarker
-      lower_bound = 0.01
-      upper_bound = 0.99
-      variable = bnds
-    [../]
-  [../]
-[]
+#[Adaptivity]
+#  marker = bound_adapt
+#  max_h_level = 2
+#  [./Indicators]
+#    [./error]
+#      type = GradientJumpIndicator
+#      variable = bnds
+#    [../]
+#  [../]
+#  [./Markers]
+#    [./bound_adapt]
+#      type = ValueRangeMarker
+#      lower_bound = 0.01
+#      upper_bound = 0.99
+#      variable = bnds
+#    [../]
+#  [../]
+#[]
 
 [Outputs]
   print_linear_residuals = true

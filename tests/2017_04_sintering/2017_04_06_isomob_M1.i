@@ -182,7 +182,7 @@
 [Preconditioning]
   [./SMP]
     type = SMP
-    coupled_groups = 'c,w c,gr0,gr1 '
+    coupled_groups = 'c,w c,gr0,gr1'
   [../]
 []
 
@@ -193,13 +193,14 @@
   solve_type = NEWTON
   petsc_options_iname = '-pc_type -ksp_grmres_restart -sub_ksp_type -sub_pc_type -pc_asm_overlap'
   petsc_options_value = 'asm         31   preonly   lu      1'
+  petsc_options = '-ksp_converged_reason -snes_converged_reason'
   l_max_its = 20
   nl_max_its = 20
   nl_abs_tol = 1e-10
   nl_rel_tol = 1e-08
   l_tol = 1e-04
-  end_time = 200
-  #dt = 0.01
+  #end_time = 200
+  num_steps = 1
   [./TimeStepper]
     type = IterationAdaptiveDT
     dt = 0.01

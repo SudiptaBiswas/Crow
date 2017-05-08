@@ -137,7 +137,7 @@
     type = GenericConstantMaterial
 
     prop_names = '  A         B       kappa_op    kappa_c  L '
-    prop_values = ' 5.0     10.0        10.0          10.0  10.0 '
+    prop_values = ' 27.0      3.0        9.0         15.0  10.0 '
     #prop_names = '  A    B  '
     #prop_values = '16.0 1.0 '
   [../]
@@ -164,6 +164,7 @@
     bulkindex = 1.0
     surfindex = 1.0
     gbindex = 1.0
+    outputs = exodus
   [../]
 []
 

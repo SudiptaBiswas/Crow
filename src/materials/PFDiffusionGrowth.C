@@ -50,8 +50,8 @@ PFDiffusionGrowth::computeQpProperties()
   Real SumEtaj = 0.0;
   for (unsigned int i = 0; i < _ncrys; ++i)
     for (unsigned int j = 0; j < _ncrys; ++j)
-    if(j!=i)
-    SumEtaj += (*_vals[i])[_qp] * (*_vals[j])[_qp]; //Sum all other order parameters
+      if (j!=i)
+        SumEtaj += (*_vals[i])[_qp] * (*_vals[j])[_qp]; //Sum all other order parameters
   Real c = _rho[_qp];
   c = c>1.0 ? 1.0 : (c<0.0 ? 0.0 : c);
 

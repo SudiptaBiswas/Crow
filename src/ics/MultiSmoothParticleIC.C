@@ -5,6 +5,7 @@
 /*             See LICENSE for full restrictions                */
 /****************************************************************/
 #include "MultiSmoothParticleIC.h"
+#include "MooseVariable.h"
 #include "MooseRandom.h"
 #include "MooseMesh.h"
 

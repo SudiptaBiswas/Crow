@@ -29,6 +29,9 @@ private:
   const VariableGradient & _grad_c;
 
   MaterialProperty<Real> & _D;
+  MaterialProperty<Real> & _Dbulk;
+  MaterialProperty<Real> & _Dsurf;
+  MaterialProperty<Real> & _Dgb;
   MaterialProperty<Real> & _dDdc;
   MaterialProperty<Real> & _M;
   MaterialProperty<Real> & _dMdc;
@@ -48,6 +51,8 @@ private:
   Real _ls;
   Real _D0;
   Real _Em;
+  Real _Dv0;
+  Real _Qvc;
   // Real _GB_energy;
   // Real _surface_energy;
   Real _GBmob0;
