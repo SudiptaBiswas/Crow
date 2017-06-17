@@ -3,14 +3,14 @@
 template<>
 InputParameters validParams<PFEigenStrainBaseMaterial>()
 {
-  InputParameters params = validParams<LinearElasticMaterial>();
+  InputParameters params = validParams<ComputeEigenstrain>();
   params.addRequiredCoupledVar("c", "Concentration");
   params.addCoupledVar("v", "order parameters");
   return params;
 }
 
 PFEigenStrainBaseMaterial::PFEigenStrainBaseMaterial(const InputParameters & parameters) :
-    DerivativeMaterialInterface<LinearElasticMaterial>(parameters),
+    DerivativeMaterialInterface<ComputeEigenstrain>(parameters),
 
     _c(coupledValue("c")),
     _c_name(getVar("c", 0)->name()),
@@ -62,7 +62,7 @@ PFEigenStrainBaseMaterial::PFEigenStrainBaseMaterial(const InputParameters & par
 
 RankTwoTensor PFEigenStrainBaseMaterial::computeStressFreeStrain()
 {
-  RankTwoTensor stress_free_strain = LinearElasticMaterial::computeStressFreeStrain();
+  RankTwoTensor stress_free_strain = computeStressFreeStrain();
 
   computeEigenStrain();
 

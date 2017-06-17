@@ -85,6 +85,7 @@
   [../]
   [./PolycrystalSinteringKernel]
     c = c
+    consider_rigidbodymotion = false
   [../]
   [./TensorMechanics]
     displacements = 'disp_x disp_y'
@@ -322,16 +323,16 @@
   [../]
 []
 
-[VectorPostprocessors]
-  [./neck]
-    type = LineValueSampler
-    variable = 'c bnds'
-    start_point = '20.0 0.0 0.0'
-    end_point = '20.0 20.0 0.0'
-    sort_by = id
-    num_points = 40
-  [../]
-[]
+#[VectorPostprocessors]
+#  [./neck]
+#    type = LineValueSampler
+#    variable = 'c bnds'
+#    start_point = '20.0 0.0 0.0'
+#    end_point = '20.0 20.0 0.0'
+#    sort_by = id
+#    num_points = 40
+#  [../]
+#[]
 
 [Executioner]
   # Preconditioned JFNK (default)
@@ -362,7 +363,7 @@
 
 [Outputs]
   exodus = true
-  output_on = 'initial timestep_end'
+  #output_on = 'initial timestep_end'
   print_linear_residuals = true
   csv = true
   gnuplot = true
@@ -370,7 +371,7 @@
   [./console]
     type = Console
     perf_log = true
-    output_on = 'initial timestep_end failed nonlinear linear'
+    #output_on = 'initial timestep_end failed nonlinear linear'
   [../]
 []
 

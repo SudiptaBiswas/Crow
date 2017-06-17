@@ -505,7 +505,7 @@
   scheme = BDF2
   solve_type = PJFNK
   petsc_options_iname = '-pc_type -ksp_grmres_restart -sub_ksp_type -sub_pc_type -pc_asm_overlap -sub_pc_factor_shift_type '
-  petsc_options_value = 'asm         31   preonly   lu      1 nonzero'
+  petsc_options_value = 'asm         31   preonly   ilu      1 nonzero'
   #petsc_options_iname = '-pc_type -ksp_grmres_restart -sub_ksp_type -sub_pc_type -pc_asm_overlap '
   #petsc_options_value = 'asm         31   preonly   lu      1'
   petsc_options = '-snes_converged_reason'

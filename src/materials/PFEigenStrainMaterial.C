@@ -86,7 +86,7 @@ void PFEigenStrainMaterial::computeEigenStrain()
 
 void PFEigenStrainMaterial::computeQpElasticityTensor()
 {
-  _Jacobian_mult[_qp] = _elasticity_tensor[_qp] = _Cijkl;
+  // _Jacobian_mult[_qp] = _elasticity_tensor[_qp] = _Cijkl;
 
   // the elasticity tensor is independent of c
   // _delasticity_tensor_dc[_qp].zero();

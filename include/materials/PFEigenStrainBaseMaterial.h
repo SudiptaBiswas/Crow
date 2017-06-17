@@ -1,7 +1,8 @@
 #ifndef PFEIGENSTRAINBASEMATERIAL_H
 #define PFEIGENSTRAINBASEMATERIAL_H
 
-#include "LinearElasticMaterial.h"
+// #include "LinearElasticMaterial.h"
+#include "ComputeEigenstrain.h"
 #include "DerivativeMaterialInterface.h"
 
 /**
@@ -11,7 +12,7 @@
  * order derivatives with respect to c, elasticity_tensor and its 1st and 2nd
  * order derivatives wrt c if it is a function of c instead of a constant.
  */
-class PFEigenStrainBaseMaterial : public DerivativeMaterialInterface<LinearElasticMaterial>
+class PFEigenStrainBaseMaterial : public DerivativeMaterialInterface<ComputeEigenstrain>
 {
 public:
   PFEigenStrainBaseMaterial(const InputParameters & parameters);

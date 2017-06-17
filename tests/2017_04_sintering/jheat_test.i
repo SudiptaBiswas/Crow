@@ -463,7 +463,7 @@
 
 [Outputs]
   print_perf_log = true
-  csv = true
+  #csv = true
   gnuplot = true
   [./exodus]
     type = Exodus

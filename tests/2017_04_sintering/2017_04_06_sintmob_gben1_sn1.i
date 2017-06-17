@@ -120,11 +120,10 @@
     block = 0
     c = c
     v = 'gr0 gr1'
-    #A = A
-    #B = B
-    #f_name = S
+    f_name = S
     derivative_order = 2
-    #outputs = console
+    outputs = exodus
+    output_properties = 'S'
   [../]
   #[./CH_mat]
   #  type = PFDiffusionGrowth
@@ -165,6 +164,72 @@
     surfindex = 1.0
     gbindex = 1.0
     outputs = exodus
+  [../]
+
+  [./elasticity_tensor_phase1]
+    type = ComputeElasticityTensor
+    base_name = phase1
+    block = 0
+    fill_method = symmetric_isotropic
+    C_ijkl = '35.46 30.141'
+  [../]
+  [./elasticity_tensor_phase0]
+    type = ComputeElasticityTensor
+    base_name = phase0
+    block = 0
+    fill_method = symmetric_isotropic
+    C_ijkl = '1.0 1.0'
+  [../]
+  [./switching_phase1]
+    type = SwitchingFunctionMaterial
+    block = 0
+    function_name = h1
+    eta = c
+    h_order = SIMPLE
+  [../]
+  [./switching_phase0]
+    type = DerivativeParsedMaterial
+    block = 0
+    f_name = h0
+    material_property_names = 'h1'
+    function = (1-h1)
+    args = c
+  [../]
+  [./elasticity_tensor]
+    type = CompositeElasticityTensor
+    block = 0
+    args = 'c gr0 gr1'
+    tensors = 'phase0   phase1'
+    weights = 'h0       h1'
+  [../]
+
+  [./smallstrain]
+    type = ComputeSmallStrain
+    block = 0
+    displacements = 'disp_x disp_y'
+  [../]
+  [./stress]
+    type = ComputeLinearElasticStress
+    block = 0
+  [../]
+  [./elstc_en]
+    type = ElasticEnergyMaterial
+    f_name = E
+    block = 0
+    args = 'c gr0 gr1'
+    derivative_order = 2
+    outputs = exodus
+    output_properties = 'E'
+  [../]
+
+  [./sum]
+    type = DerivativeSumMaterial
+    block = 0
+    sum_materials = 'S E'
+    args = 'c gr0 gr1'
+    derivative_order = 2
+    outputs = exodus
+    output_properties = 'F'
   [../]
 []
 

@@ -83,14 +83,14 @@
 []
 
 [ICs]
-  #[./T]
-  #  type = RandomIC
-  #  variable = T
-  #[../]
-  #[./elec]
-  #  type = RandomIC
-  #  variable = elec
-  #[../]
+  [./T]
+    type = RandomIC
+    variable = T
+  [../]
+  [./elec]
+    type = RandomIC
+    variable = elec
+  [../]
 []
 
 
