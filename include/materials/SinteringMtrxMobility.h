@@ -45,6 +45,8 @@ private:
   Real _ls;
   Real _D0;
   Real _Em;
+  Real _Dv0;
+  Real _Qvc;
   // Real _GB_energy;
   // Real _surface_energy;
   Real _GBmob0;

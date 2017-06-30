@@ -15,7 +15,8 @@ InputParameters validParams<SinteringMtrxMobility>()
   params.addParam<Real>("ls", 1.0e-9,"Surface layer thickness in m");
   params.addParam<Real>("Dvol0", 0.01, "Volumetric diffusion coefficient ");
   params.addParam<Real>("Dvap0", 0.001, "Vapor Diffusion ");
-  params.addRequiredParam<Real>("Qv", "Vacancy migration energy in eV");
+  params.addRequiredParam<Real>("Qv", "Bulk diffusion activation energy in eV");
+  params.addRequiredParam<Real>("Qvc", "Vacancy migration energy in eV");
   params.addParam<Real>("GBmob0", 0, "Grain boundary mobility prefactor in m^4/(J*s)");
   params.addParam<Real>("Qgbm", 0, "Grain boundary migration activation energy in eV");
   params.addParam<Real>("Vm", 1.25e-28, "Atomic volume in m^3");
@@ -50,6 +51,8 @@ SinteringMtrxMobility::SinteringMtrxMobility(const InputParameters & parameters)
     _ls(getParam<Real>("ls")),
     _D0(getParam<Real>("Dvol0")),
     _Em(getParam<Real>("Qv")),
+    _Dv0(getParam<Real>("Dvap0")),
+    _Qvc(getParam<Real>("Qvc")),
     _GBmob0(getParam<Real>("GBmob0")),
     _Q(getParam<Real>("Qgbm")),
     _omega(getParam<Real>("Vm")),
@@ -97,6 +100,7 @@ SinteringMtrxMobility::computeProperties()
   // const Real surface_energy = _surface_energy/(energy_scale*_length_scale); //Non-dimensionalized surface energy
   // _time_scale = (_length_scale * _length_scale)/(GBmob * _GB_energy); // time scale in s
   const Real D0_c = _D0 * _time_scale / (_length_scale * _length_scale); // Non-dimensionalized Bulk Diffusivity prefactor
+  const Real Dv0_c = _Dv0 * _time_scale / (_length_scale * _length_scale); // Non-dimensionalized Bulk Diffusivity prefactor
   const Real Dgb0_c = _Dgb0 * _time_scale / (_length_scale * _length_scale); // Non-dimensionalized GB Diffusivity prefactor
   const Real Ds0_c = _Ds0 * _time_scale / (_length_scale * _length_scale); // Non-dimensionalized Surface Diffusivity prefactor
   const Real GBmob0_c = _GBmob0 * _time_scale / (_JtoeV * (_length_scale*_length_scale*_length_scale*_length_scale)); // Convert to lengthscale^4/(eV*timescale);
@@ -133,6 +137,7 @@ SinteringMtrxMobility::computeProperties()
 
     // Compute bulk Diffusivity (bulk diffusion is turned on by default)
     Real Dbulk = D0_c * std::exp(-_Em/(_kb * _T[_qp]));
+    Real Dvap = Dv0_c * std::exp(-_Qvc/(_kb * _T[_qp]));
     Real phi = 10.0*c*c*c - 15.0*c*c*c*c + 6.0*c*c*c*c*c; // interpolation function
     phi = phi>1.0 ? 1.0 : (phi<0.0 ? 0.0 : phi);
     Real mult_bulk = 1.0 - phi;
@@ -197,13 +202,15 @@ SinteringMtrxMobility::computeProperties()
     // Compute different mobility tensors and their derivatives
     RealTensorValue Mbulk = Dbulk * mult_bulk * I;
     RealTensorValue dMbulkdc = Dbulk * dmult_bulk * I;
+    RealTensorValue Mvap = Dvap * mult_bulk * I;
+    RealTensorValue dMvapdc = Dvap * dmult_bulk * I;
     RealTensorValue Msurf = Dsurf * mult_surf;
     RealTensorValue dMsurfdc = Dsurf * dmult_surf;
     // RealTensorValue Mgb = Dgb * omega / d2F;
 
     // Compute the total mobility tensor and its derivative
-    _D[_qp] = (_bulkindex * Mbulk  + _gbindex * Dgb + _surfindex * Msurf);
-    _dDdc[_qp] = (_bulkindex * dMbulkdc + _surfindex * dMsurfdc);
+    _D[_qp] = (_bulkindex * Mbulk + _bulkindex * Mvap + _gbindex * Dgb + _surfindex * Msurf);
+    _dDdc[_qp] = (_bulkindex * dMbulkdc + _bulkindex * dMvapdc + _surfindex * dMsurfdc);
     _M[_qp] = (_bulkindex * Mbulk  + _gbindex * Dgb + _surfindex * Msurf) * omega / d2F;
     _dMdc[_qp] = (_bulkindex * dMbulkdc + _surfindex * dMsurfdc) * omega / d2F;
   }
