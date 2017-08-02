@@ -8,6 +8,7 @@ InputParameters validParams<SinteringMtrxMobility>()
   InputParameters params = validParams<Material>();
   params.addRequiredCoupledVar("c","phase field variable");
   params.addRequiredCoupledVarWithAutoBuild("v", "var_name_base", "op_num", "Array of coupled variables");
+  params.addParam<bool>("constant_diffusivity", false, "Activate for assigning constant diffuion coefficients.");
   params.addCoupledVar("T", "Temperature variable in Kelvin");
   params.addRequiredParam<Real>("int_width","The interfacial width in the lengthscale of the problem");
   params.addParam<Real>("length_scale", 1.0e-9,"defines the base length scale of the problem in m");
@@ -43,6 +44,7 @@ SinteringMtrxMobility::SinteringMtrxMobility(const InputParameters & parameters)
     _M(declareProperty<RealTensorValue>("M")),
     _dMdc(declareProperty<RealTensorValue>("dMdc")),
     // _L(declareProperty<Real>("L")),
+    // _const_mat(getParam<bool>("constant_diffusivity")),
     _A(getMaterialProperty<Real>("A")),
     _B(getMaterialProperty<Real>("B")),
     _time_scale(getParam<Real>("time_scale")),
@@ -138,6 +140,8 @@ SinteringMtrxMobility::computeProperties()
     // Compute bulk Diffusivity (bulk diffusion is turned on by default)
     Real Dbulk = D0_c * std::exp(-_Em/(_kb * _T[_qp]));
     Real Dvap = Dv0_c * std::exp(-_Qvc/(_kb * _T[_qp]));
+    // Real Dbulk = 0.01;
+    // Real Dvap = 0.001;
     Real phi = 10.0*c*c*c - 15.0*c*c*c*c + 6.0*c*c*c*c*c; // interpolation function
     phi = phi>1.0 ? 1.0 : (phi<0.0 ? 0.0 : phi);
     Real mult_bulk = 1.0 - phi;
@@ -148,6 +152,7 @@ SinteringMtrxMobility::computeProperties()
     if (_gbindex > 0.0) // compute only when GB diffusion is turned on
     {
       D_GB = Dgb0_c * std::exp(-_Qgb/(_kb * _T[_qp]));
+      // D_GB = 0.4;
       for (unsigned int i = 0; i < _ncrys; ++i)
         for (unsigned int j = 0; j < _ncrys; ++j)
         {
@@ -194,6 +199,7 @@ SinteringMtrxMobility::computeProperties()
         }
 
       Dsurf = Ds0_c * std::exp(-_Qs/(_kb * _T[_qp]));
+      // Dsurf = 4.0;
       mult_surf = (c * mc) * Ts;
       dmult_surf = (1 - 2.0*c) * Ts + (c * mc) * dTs;
     }
@@ -209,8 +215,8 @@ SinteringMtrxMobility::computeProperties()
     // RealTensorValue Mgb = Dgb * omega / d2F;
 
     // Compute the total mobility tensor and its derivative
-    _D[_qp] = (_bulkindex * Mbulk + _bulkindex * Mvap + _gbindex * Dgb + _surfindex * Msurf);
-    _dDdc[_qp] = (_bulkindex * dMbulkdc + _bulkindex * dMvapdc + _surfindex * dMsurfdc);
+    _D[_qp] = (_bulkindex * Mbulk + _gbindex * Dgb + _surfindex * Msurf);
+    _dDdc[_qp] = (_bulkindex * dMbulkdc + _surfindex * dMsurfdc);
     _M[_qp] = (_bulkindex * Mbulk  + _gbindex * Dgb + _surfindex * Msurf) * omega / d2F;
     _dMdc[_qp] = (_bulkindex * dMbulkdc + _surfindex * dMsurfdc) * omega / d2F;
   }
