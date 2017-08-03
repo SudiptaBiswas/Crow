@@ -51,6 +51,7 @@
     type = SplitCHWResAniso
     variable = w
     mob_name = D
+    scaling = 1e-4
   [../]
   [./time]
     type = CoupledTimeDerivative
@@ -113,7 +114,7 @@
   [../]
   [./mob]
     type = SinteringMtrxMobility
-    T = 1500.0
+    T = 1400.0
     int_width = 2
     GBmob0 = 3.2e-6
     Qv = 5.22

@@ -24,6 +24,7 @@
     #scaling = 10
   [../]
   [./w]
+    #scaling = 1e-2
   [../]
   [./PolycrystalVariables]
   [../]
@@ -133,7 +134,7 @@
     bulkindex = 1.0
     surfindex = 1.0
     gbindex = 1.0
-    outputs = exodus
+    #outputs = exodus
   [../]
 []
 
@@ -187,7 +188,8 @@
 [Preconditioning]
   [./SMP]
     type = SMP
-    coupled_groups = 'c,w c,gr0,gr1'
+    full = true
+    #coupled_groups = 'c,w c,gr0,gr1'
   [../]
 []
 
@@ -198,7 +200,8 @@
   solve_type = NEWTON
   petsc_options_iname = '-pc_type -ksp_grmres_restart -sub_ksp_type -sub_pc_type -pc_asm_overlap'
   petsc_options_value = 'asm         31   preonly   ilu      1'
-  petsc_options = '-snes_converged_reason'
+  #petsc_options = '-snes_converged_reason'
+  #line_search = 'none'
   l_max_its = 20
   nl_max_its = 20
   nl_abs_tol = 1e-10
@@ -232,20 +235,21 @@
   [../]
 []
 
-[Outputs]
-  print_linear_residuals = true
-  csv = true
-  gnuplot = true
-  print_perf_log = true
-  [./console]
-    type = Console
-    perf_log = true
-  [../]
-  [./exodus]
-    type = Exodus
-    elemental_as_nodal = true
-  [../]
-[]
+#[Outputs]
+#  print_linear_residuals = true
+#  csv = true
+#  gnuplot = true
+#  print_perf_log = true
+#  exodus = true
+#  [./console]
+#    type = Console
+#    perf_log = true
+#  [../]
+#  #[./exodus]
+#  #  type = Exodus
+#  #  elemental_as_nodal = true
+#  #[../]
+#[]
 
 [ICs]
   [./ic_gr1]

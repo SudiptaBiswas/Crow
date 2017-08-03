@@ -113,7 +113,7 @@
   [../]
   [./mob]
     type = SinteringMtrxMobility
-    T = 1500.0
+    T = 1200.0
     int_width = 2
     GBmob0 = 3.2e-6
     Qv = 5.22
@@ -198,7 +198,6 @@
   solve_type = NEWTON
   petsc_options_iname = '-pc_type -ksp_grmres_restart -sub_ksp_type -sub_pc_type -pc_asm_overlap'
   petsc_options_value = 'asm         31   preonly   ilu      1'
-  petsc_options = '-snes_converged_reason'
   l_max_its = 20
   nl_max_its = 20
   nl_abs_tol = 1e-10

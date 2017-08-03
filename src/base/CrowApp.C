@@ -1,12 +1,10 @@
 #include "CrowApp.h"
-// #include "Moose.h"
-#include "Factory.h"
-#include "ActionFactory.h"
+#include "Moose.h"
 #include "AppFactory.h"
 #include "MooseSyntax.h"
-//#include "CombinedApp.h"
+#include "ModulesApp.h"
+
 #include "PhaseFieldApp.h"
-//#include "SolidMechanicsApp.h"
 #include "TensorMechanicsApp.h"
 #include "HeatConductionApp.h"
 #include "MiscApp.h"
@@ -15,6 +13,8 @@
 #  include "MarmotApp.h"
 #  include "MarmotSyntax.h"
 #endif
+
+#include "CrowRevision.h"
 
 #include "CHChemPotential.h"
 #include "CHTemp.h"
@@ -74,36 +74,30 @@ template<>
 InputParameters validParams<CrowApp>()
 {
   InputParameters params = validParams<MooseApp>();
-  params.set<bool>("use_legacy_uo_initialization") = false;
-  params.set<bool>("use_legacy_uo_aux_computation") = false;
   return params;
 }
 
-CrowApp::CrowApp(const InputParameters & parameters) :
-    MooseApp(parameters)
+CrowApp::CrowApp(const InputParameters & parameters) : MooseApp(parameters)
 {
   Moose::registerObjects(_factory);
+
   PhaseFieldApp::registerObjects(_factory);
-  //SolidMechanicsApp::registerObjects(_factory);
   TensorMechanicsApp::registerObjects(_factory);
   HeatConductionApp::registerObjects(_factory);
   MiscApp::registerObjects(_factory);
+
   CrowApp::registerObjects(_factory);
 
   Moose::associateSyntax(_syntax, _action_factory);
-//  ModulesApp::associateSyntax(_syntax, _action_factory);
   PhaseFieldApp::associateSyntax(_syntax, _action_factory);
-   //SolidMechanicsApp::associateSyntax(_syntax, _action_factory);
   TensorMechanicsApp::associateSyntax(_syntax, _action_factory);
   HeatConductionApp::associateSyntax(_syntax, _action_factory);
   MiscApp::associateSyntax(_syntax, _action_factory);
-  // CombinedApp::associateSyntax(_syntax, _action_factory);
-//+  MooseTestApp::associateSyntax(_syntax, _action_factory);
 
-  #ifdef MARMOT_ENABLED
-    MarmotApp::registerObjects(_factory);
-    Marmot::associateSyntax(_syntax, _action_factory);
-  #endif
+  // #ifdef MARMOT_ENABLED
+  //   MarmotApp::registerObjects(_factory);
+  //   Marmot::associateSyntax(_syntax, _action_factory);
+  // #endif
 
   CrowApp::associateSyntax(_syntax, _action_factory);
 }
@@ -111,7 +105,6 @@ CrowApp::CrowApp(const InputParameters & parameters) :
 CrowApp::~CrowApp()
 {
 }
-
 
 extern "C" void CrowApp__registerApps() { CrowApp::registerApps(); }
 void
@@ -130,6 +123,9 @@ extern "C" void CrowApp__registerObjects(Factory & factory) { CrowApp::registerO
 void
 CrowApp::registerObjects(Factory & factory)
 {
+  #ifdef MARMOT_ENABLED
+    MarmotApp::registerObjects(factory);
+  #endif
 
   // #undef registerObject
   // #define registerObject(name) factory.reg<name>(stringifyName(name))
