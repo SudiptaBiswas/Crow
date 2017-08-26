@@ -182,7 +182,7 @@
     v = 'gr0 gr1'
     Vm = 1.5829e-29
     length_scale = 1e-08
-    time_scale = 1e-4
+    time_scale = 1.0
     bulkindex = 1.0
     surfindex = 1.0
     gbindex = 1.0

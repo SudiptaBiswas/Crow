@@ -3,7 +3,7 @@
 #ifndef CROW_REVISION_H
 #define CROW_REVISION_H
 
-#define CROW_REVISION "git commit 6ea8dc9 on 2017-08-03"
-#define CROW_VERSION "6ea8dc9"
+#define CROW_REVISION "git commit 2481f3e on 2017-08-26"
+#define CROW_VERSION "2481f3e"
 
 #endif // CROW_REVISION_H

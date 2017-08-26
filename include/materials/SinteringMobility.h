@@ -35,17 +35,12 @@ private:
   MaterialProperty<Real> & _dDdc;
   MaterialProperty<Real> & _M;
   MaterialProperty<Real> & _dMdc;
-  // MaterialProperty<Real> & _L;
-  // MaterialProperty<Real> & _kappa_c;
-  // MaterialProperty<Real> & _kappa_op;
+
   const MaterialProperty<Real> & _A;
   const MaterialProperty<Real> & _B;
-  // MaterialProperty<Real> & _time_scale;
-  // MaterialProperty<Real> & _energy_scale;
 
   Real _time_scale;
   Real _energy_scale;
-
   Real _int_width;
   Real _length_scale;
   Real _ls;
@@ -53,10 +48,6 @@ private:
   Real _Em;
   Real _Dv0;
   Real _Qvc;
-  // Real _GB_energy;
-  // Real _surface_energy;
-  Real _GBmob0;
-  Real _Q;
   Real _omega;
   Real _Ds0;
   Real _Dgb0;
@@ -65,7 +56,7 @@ private:
   Real _surfindex;
   Real _gbindex;
   Real _bulkindex;
-  Real _GBMobility;
+  Real _prefactor;
 
   // Constants
   const Real _JtoeV;

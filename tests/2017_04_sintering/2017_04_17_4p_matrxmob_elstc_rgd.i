@@ -539,18 +539,18 @@
 []
 
 [Outputs]
-  print_linear_residuals = true
-  csv = true
-  gnuplot = true
-  print_perf_log = true
-  [./console]
-    type = Console
-    perf_log = true
-  [../]
-  [./exodus]
-    type = Exodus
-    elemental_as_nodal = true
-  [../]
+  #print_linear_residuals = true
+  #csv = true
+  #gnuplot = true
+  #print_perf_log = true
+  #[./console]
+  #  type = Console
+  #  perf_log = true
+  #[../]
+  #[./exodus]
+  #  type = Exodus
+  #  elemental_as_nodal = true
+  #[../]
 []
 
 [ICs]

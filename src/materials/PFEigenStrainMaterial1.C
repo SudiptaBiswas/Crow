@@ -4,7 +4,7 @@
 
 //#include "AddV.h"
 template<>
-InputParameters validParams<ComputeVariableEigenstrain>()
+InputParameters validParams<PFEigenStrainMaterial1>()
 {
   InputParameters params = validParams<ComputeVariableEigenstrain>();
   params.addCoupledVar("v", "order parameters");

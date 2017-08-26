@@ -157,6 +157,7 @@
     #surface_energy = 9.33
     GBmob0 = 3.986e-6
     Qv = 2.0
+    Qvc = 2.3
     Qgb = 4.143
     Qs = 3.14
     Qgbm = 0.94
@@ -199,10 +200,10 @@
   [./tstep]
     type = TimestepSize
   [../]
-  [./run_time]
-    type = RunTime
-    time_type = active
-  [../]
+  #[./run_time]
+  #  type = RunTime
+  #  time_type = active
+  #[../]
   [./int_area]
     type = InterfaceAreaPostprocessor
     variable = c
@@ -250,7 +251,7 @@
 
 [Adaptivity]
   marker = bound_adapt
-  max_h_level = 2
+  max_h_level = 1
   [./Indicators]
     [./error]
       type = GradientJumpIndicator

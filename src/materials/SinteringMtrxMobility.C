@@ -8,7 +8,6 @@ InputParameters validParams<SinteringMtrxMobility>()
   InputParameters params = validParams<Material>();
   params.addRequiredCoupledVar("c","phase field variable");
   params.addRequiredCoupledVarWithAutoBuild("v", "var_name_base", "op_num", "Array of coupled variables");
-  params.addParam<bool>("constant_diffusivity", false, "Activate for assigning constant diffuion coefficients.");
   params.addCoupledVar("T", "Temperature variable in Kelvin");
   params.addRequiredParam<Real>("int_width","The interfacial width in the lengthscale of the problem");
   params.addParam<Real>("length_scale", 1.0e-9,"defines the base length scale of the problem in m");
@@ -31,6 +30,7 @@ InputParameters validParams<SinteringMtrxMobility>()
   params.addParam<MaterialPropertyName>("A", "A", "The co-efficient used for free energy");
   params.addParam<MaterialPropertyName>("B", "B", "The co-efficient used for free energy");
   params.addParam<Real>("GBMobility", -1, "GB mobility input in m^4/(J*s), that overrides the temperature dependent calculation");
+  params.addParam<Real>("prefactor", 1.0, "prefactor for increasing surface diffusion.");
   return params;
 }
 
@@ -39,12 +39,15 @@ SinteringMtrxMobility::SinteringMtrxMobility(const InputParameters & parameters)
     _T(coupledValue("T")),
     _c(coupledValue("c")),
     _grad_c(coupledGradient("c")),
+    // _Dbulk(declareProperty<RealTensorValue>("Dbulk")),
+    // _Dsurf(declareProperty<RealTensorValue>("Dsurf")),
+    // _Dgb(declareProperty<RealTensorValue>("Dgb")),
     _D(declareProperty<RealTensorValue>("D")),
-    _dDdc(declareProperty<RealTensorValue>("dDdc")),
     _M(declareProperty<RealTensorValue>("M")),
+    _dDdc(declareProperty<RealTensorValue>("dDdc")),
     _dMdc(declareProperty<RealTensorValue>("dMdc")),
-    // _L(declareProperty<Real>("L")),
-    // _const_mat(getParam<bool>("constant_diffusivity")),
+    _detD(declareProperty<Real>("det_D")),
+    _detM(declareProperty<Real>("det_M`")),
     _A(getMaterialProperty<Real>("A")),
     _B(getMaterialProperty<Real>("B")),
     _time_scale(getParam<Real>("time_scale")),
@@ -55,8 +58,6 @@ SinteringMtrxMobility::SinteringMtrxMobility(const InputParameters & parameters)
     _Em(getParam<Real>("Qv")),
     _Dv0(getParam<Real>("Dvap0")),
     _Qvc(getParam<Real>("Qvc")),
-    _GBmob0(getParam<Real>("GBmob0")),
-    _Q(getParam<Real>("Qgbm")),
     _omega(getParam<Real>("Vm")),
     _Ds0(getParam<Real>("Dsurf0")),
     _Dgb0(getParam<Real>("Dgb0")),
@@ -65,14 +66,11 @@ SinteringMtrxMobility::SinteringMtrxMobility(const InputParameters & parameters)
     _surfindex(getParam<Real>("surfindex")),
     _gbindex(getParam<Real>("gbindex")),
     _bulkindex(getParam<Real>("bulkindex")),
-    _GBMobility(getParam<Real>("GBMobility")),
+    _prefactor(getParam<Real>("prefactor")),
     _JtoeV(6.24150974e18), // Joule to eV conversion
     _kb(8.617343e-5), // Boltzmann constant in eV/K
     _ncrys(coupledComponents("v"))
 {
-  if (_GBMobility == -1 && _GBmob0 == 0)
-    mooseError("Either a value for GBMobility or for GBmob0 and Q must be provided");
-
   if (_ncrys == 0)
     mooseError("Model requires op_num > 0");
 
@@ -105,29 +103,10 @@ SinteringMtrxMobility::computeProperties()
   const Real Dv0_c = _Dv0 * _time_scale / (_length_scale * _length_scale); // Non-dimensionalized Bulk Diffusivity prefactor
   const Real Dgb0_c = _Dgb0 * _time_scale / (_length_scale * _length_scale); // Non-dimensionalized GB Diffusivity prefactor
   const Real Ds0_c = _Ds0 * _time_scale / (_length_scale * _length_scale); // Non-dimensionalized Surface Diffusivity prefactor
-  const Real GBmob0_c = _GBmob0 * _time_scale / (_JtoeV * (_length_scale*_length_scale*_length_scale*_length_scale)); // Convert to lengthscale^4/(eV*timescale);
   const Real omega = _omega / (_length_scale * _length_scale * _length_scale); // omega/kT in m^3/J
 
   for (_qp = 0; _qp < _qrule->n_points(); ++_qp)
   {
-    // Energetic parameters
-    // _kappa_c[_qp] =  3.0/4.0 * (2.0 * surface_energy - GB_energy) * int_width_c;
-    // _kappa_c[_qp] =  3.0/4.0 * surface_energy * int_width_c;
-    // _kappa_op[_qp] = 3.0/4.0* GB_energy * int_width_c;
-    // _A[_qp] = (12.0 * surface_energy - 7.0 * GB_energy) / int_width_c;
-    // _B[_qp] = GB_energy / int_width_c;
-
-    // Kinetic parameters
-    Real GBmob;
-    if (_GBMobility < 0)
-      GBmob = GBmob0_c * std::exp(-_Q / (_kb * _T[_qp]));
-    else
-      GBmob = _GBMobility * _time_scale / (_JtoeV * (_length_scale*_length_scale*_length_scale*_length_scale));; // GBMobility in m^4/(J*s)
-
-    // _L[_qp] = 4.0/3.0 * GBmob / int_width_c; // Non-dimensionalized Allen-Cahn Mobility
-
-    // Real GB_M = GBmob * _time_scale * energy_scale /_length_scale; // Non-dimensionalized GB Mobility
-
     Real c = _c[_qp];
     c = c>1.0 ? 1.0 : (c<0.0 ? 0.0 : c);
     Real mc = 1.0 - c;
@@ -186,8 +165,8 @@ SinteringMtrxMobility::computeProperties()
       if (_grad_c[_qp].norm() > 1.0e-10)
         ns = _grad_c[_qp] / _grad_c[_qp].norm();
 
-      RealTensorValue Ts;
-      RealTensorValue dTs;
+      RealTensorValue Ts(0.0);
+      RealTensorValue dTs(0.0);
       for (unsigned int a = 0; a < 3; ++a)
         for (unsigned int b = 0; b < 3; ++b)
         {
@@ -195,13 +174,16 @@ SinteringMtrxMobility::computeProperties()
            * non-negative everywhere in the domain
            */
           Ts(a,b) = (1.0+1.0e-3) * I(a,b) - ns(a) * ns(b);
+          // std::cout << "Ts_"<< a << b << "= " << Ts(a,b) << ", ns = " << ns << ".\n";
           dTs(a,b) = - 2.0 * dns(a) * ns(b);
         }
 
       Dsurf = Ds0_c * std::exp(-_Qs/(_kb * _T[_qp]));
       // Dsurf = 4.0;
-      mult_surf = (c * mc) * Ts;
-      dmult_surf = (1 - 2.0*c) * Ts + (c * mc) * dTs;
+      // mult_surf = (c * mc) * Ts;
+      mult_surf = 30 * (c * c * mc * mc) * Ts;
+      // dmult_surf = (1 - 2.0*c) * Ts + (c * mc) * dTs;
+      dmult_surf = 30 * (2.0 * c * mc * mc - 2.0 * c * c * mc) * Ts + 30 * c * c * mc * mc * dTs;
     }
 
     Real d2F =  12.0 * _A[_qp] * c * c - 12.0 * _A[_qp] * c + 2.0 * (_A[_qp] + _B[_qp]);
@@ -211,15 +193,32 @@ SinteringMtrxMobility::computeProperties()
     RealTensorValue Mvap = Dvap * mult_bulk * I;
     RealTensorValue dMvapdc = Dvap * dmult_bulk * I;
     RealTensorValue Msurf = Dsurf * mult_surf;
-    RealTensorValue dMsurfdc = Dsurf * dmult_surf;
+    //std::cout << "Dsurf = " << Dsurf << " and \n";
+    //std::cout << "ns = " << Ts << " and \n";
+    //std::cout << "mult = " << mult_surf <<" and \n";
+    //std::cout << "Msurf = " << Msurf << "\n";
+    RealTensorValue dMsurfdc = _prefactor * Dsurf * dmult_surf;
     // RealTensorValue Mgb = Dgb * omega / d2F;
 
     // Compute the total mobility tensor and its derivative
-    _D[_qp] = (_bulkindex * Mbulk + _gbindex * Dgb + _surfindex * Msurf);
-    _dDdc[_qp] = (_bulkindex * dMbulkdc + _surfindex * dMsurfdc);
-    _M[_qp] = (_bulkindex * Mbulk  + _gbindex * Dgb + _surfindex * Msurf) * omega / d2F;
-    _dMdc[_qp] = (_bulkindex * dMbulkdc + _surfindex * dMsurfdc) * omega / d2F;
-  }
+    // _D[_qp] = (_bulkindex * Mbulk + _gbindex * Dgb + _surfindex * Msurf);
+    // _dDdc[_qp] = (_bulkindex * dMbulkdc + _surfindex * dMsurfdc);
+    // _D[_qp] = (_bulkindex * Mbulk + _bulkindex * Mvap + _gbindex * Dgb + _surfindex * Msurf);
+    // _dDdc[_qp] = (_bulkindex * dMbulkdc + _bulkindex * dMvapdc + _surfindex * dMsurfdc);
+    // _Dbulk[_qp] = _bulkindex * Mbulk;
+    // _Dsurf[_qp] = _surfindex * Msurf;
+    // _Dgb[_qp] = _gbindex * Dgb;
+    // _D[_qp] = _prefactor * (_Dbulk[_qp] + _Dgb[_qp] + _Dsurf[_qp]);
+    _D[_qp] = _prefactor * (_bulkindex * Mbulk + _gbindex * Dgb + _surfindex * Msurf);
+    // _dDdc[_qp] = (_bulkindex * dMbulkdc + _bulkindex * dMvapdc + _surfindex * dMsurfdc);
+    _dDdc[_qp] = _prefactor * (_bulkindex * dMbulkdc + _surfindex * dMsurfdc);
+    _M[_qp] = _D[_qp] * omega / (_kb * _T[_qp]);
+    // _dMdc[_qp] = _dDdc[_qp] * omega / d2F;
+    _dMdc[_qp] = _dDdc[_qp] * omega / (_kb * _T[_qp]);
+    // _M[_qp] = (_bulkindex * Mbulk  + _gbindex * Dgb + _surfindex * Msurf) * omega / d2F;
+    // _dMdc[_qp] = (_bulkindex * dMbulkdc + _surfindex * dMsurfdc) * omega / d2F;
   // Compute the mobility determinant
-  // _detM[_qp] = _M[_qp].det(); // to make sure it is non-negative anywhere in the domain
+    _detD[_qp] = _D[_qp].det(); // to make sure it is non-negative anywhere in the domain
+    _detM[_qp] = _M[_qp].det(); // to make sure it is non-negative anywhere in the domain
+  }
 }

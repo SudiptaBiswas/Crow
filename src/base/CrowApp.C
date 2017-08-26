@@ -9,6 +9,9 @@
 #include "HeatConductionApp.h"
 #include "MiscApp.h"
 
+// #include "MarmotApp.h"
+// #include "MarmotSyntax.h"
+
 #ifdef MARMOT_ENABLED
 #  include "MarmotApp.h"
 #  include "MarmotSyntax.h"
@@ -20,6 +23,7 @@
 #include "CHTemp.h"
 #include "ACSinteringGrowth.h"
 #include "ACParticleGrowth.h"
+#include "ACParticleGrowthAniso.h"
 #include "ElectricFieldKernel.h"
 #include "ElectricBCKernel.h"
 #include "VacancySourceTermKernel.h"
@@ -32,8 +36,8 @@
 #include "PFDiffusionGrowthMtrx.h"
 #include "PFDiffusionGrowth1.h"
 #include "PFParticleGrowth.h"
-// #include "PFEigenStrainMaterial.h"
-// #include "PFEigenStrainMaterial1.h"
+#include "PFEigenStrainMaterial.h"
+#include "PFEigenStrainMaterial1.h"
 #include "TwoParticleGrainsIC.h"
 #include "PFTempMobility.h"
 #include "Mobility.h"
@@ -47,10 +51,12 @@
 #include "SinteringMobility.h"
 #include "SinteringMtrxMobility.h"
 #include "SinteringDiffusion.h"
+#include "SinteringCoefficients.h"
+#include "SinteringCoefficientsAniso.h"
 #include "ThermalVariation.h"
 #include "ElectricBCMat.h"
-#include "RadiationDefectSource.h"
-#include "RadiationDefectCreation.h"
+//#include "RadiationDefectSource.h"
+//#include "RadiationDefectCreation.h"
 
 #include "PolycrystalSinteringKernelAction.h"
 #include "PolycrystalSinteringMaterialAction.h"
@@ -94,10 +100,10 @@ CrowApp::CrowApp(const InputParameters & parameters) : MooseApp(parameters)
   HeatConductionApp::associateSyntax(_syntax, _action_factory);
   MiscApp::associateSyntax(_syntax, _action_factory);
 
-  // #ifdef MARMOT_ENABLED
-  //   MarmotApp::registerObjects(_factory);
-  //   Marmot::associateSyntax(_syntax, _action_factory);
-  // #endif
+  #ifdef MARMOT_ENABLED
+    MarmotApp::registerObjects(_factory);
+    Marmot::associateSyntax(_syntax, _action_factory);
+  #endif
 
   CrowApp::associateSyntax(_syntax, _action_factory);
 }
@@ -123,9 +129,9 @@ extern "C" void CrowApp__registerObjects(Factory & factory) { CrowApp::registerO
 void
 CrowApp::registerObjects(Factory & factory)
 {
-  #ifdef MARMOT_ENABLED
-    MarmotApp::registerObjects(factory);
-  #endif
+  // #ifdef MARMOT_ENABLED
+  //   MarmotApp::registerObjects(factory);
+  // #endif
 
   // #undef registerObject
   // #define registerObject(name) factory.reg<name>(stringifyName(name))
@@ -135,6 +141,7 @@ CrowApp::registerObjects(Factory & factory)
   registerKernel(CHTemp);
   registerKernel(ACSinteringGrowth);
   registerKernel(ACParticleGrowth);
+  registerKernel(ACParticleGrowthAniso);
   registerKernel(ElectricFieldKernel);
   registerKernel(ElectricBCKernel);
   registerKernel(VacancySourceTermKernel);
@@ -142,7 +149,7 @@ CrowApp::registerObjects(Factory & factory)
   registerKernel(ConservedLangevinNoiseVoidSource);
   registerKernel(LangevinNoiseVoid);
   registerKernel(RigidBodyMotionKernel);
-  registerKernel(RadiationDefectSource);
+  //registerKernel(RadiationDefectSource);
   registerFunction(RandomNumberGeneration);
 
   registerMaterial(PFDiffusion);
@@ -151,8 +158,8 @@ CrowApp::registerObjects(Factory & factory)
   registerMaterial(PFDiffusionGrowth);
   registerMaterial(PFDiffusionGrowthMtrx);
   registerMaterial(PFDiffusionGrowth1);
-  // registerMaterial(PFEigenStrainMaterial);
-  // registerMaterial(PFEigenStrainMaterial1);
+  registerMaterial(PFEigenStrainMaterial);
+  registerMaterial(PFEigenStrainMaterial1);
   registerMaterial(PFParticleGrowth);
   registerMaterial(PFTempMobility);
   registerMaterial(Mobility);
@@ -162,8 +169,10 @@ CrowApp::registerObjects(Factory & factory)
   registerMaterial(SinteringMobility);
   registerMaterial(SinteringMtrxMobility);
   registerMaterial(SinteringDiffusion);
+  registerMaterial(SinteringCoefficients);
+  registerMaterial(SinteringCoefficientsAniso);
   registerMaterial(ElectricBCMat);
-  registerMaterial(RadiationDefectCreation);
+  //registerMaterial(RadiationDefectCreation);
 
   registerInitialCondition(TwoParticleGrainsIC);
   registerInitialCondition(TwoParticleDensityIC);

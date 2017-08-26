@@ -28,10 +28,17 @@ private:
   const VariableValue & _c;
   const VariableGradient & _grad_c;
 
+  // MaterialProperty<RealTensorValue> & _Dbulk;
+  // MaterialProperty<RealTensorValue> & _Dsurf;
+  // MaterialProperty<RealTensorValue> & _Dgb;
   MaterialProperty<RealTensorValue> & _D;
-  MaterialProperty<RealTensorValue> & _dDdc;
   MaterialProperty<RealTensorValue> & _M;
+  MaterialProperty<RealTensorValue> & _dDdc;
   MaterialProperty<RealTensorValue> & _dMdc;
+  MaterialProperty<Real> & _detD;
+  MaterialProperty<Real> & _detM;
+  // MaterialProperty<RealTensorValue> & _M;
+  // MaterialProperty<RealTensorValue> & _dMdc;
   // MaterialProperty<Real> & _L;
   // MaterialProperty<Real> & _kappa_c;
   // MaterialProperty<Real> & _kappa_op;
@@ -47,10 +54,6 @@ private:
   Real _Em;
   Real _Dv0;
   Real _Qvc;
-  // Real _GB_energy;
-  // Real _surface_energy;
-  Real _GBmob0;
-  Real _Q;
   Real _omega;
   Real _Ds0;
   Real _Dgb0;
@@ -59,7 +62,7 @@ private:
   Real _surfindex;
   Real _gbindex;
   Real _bulkindex;
-  Real _GBMobility;
+  Real _prefactor;
 
   // Constants
   const Real _JtoeV;

@@ -18,8 +18,8 @@ private:
   MaterialPropertyName _mob_name;
   MaterialPropertyName _kappa_name;
   bool _consider_rbm;
+  bool _anisotropic;
   bool _implicit;
-
 };
 
 template<>
