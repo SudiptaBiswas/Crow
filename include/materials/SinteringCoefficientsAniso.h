@@ -22,8 +22,15 @@ public:
 protected:
   virtual void computeProperties();
 
-private:
+// private:
+  const unsigned int _mesh_dimension;
+
   const VariableValue & _T;
+  std::vector<const VariableValue *> _vals;
+  std::vector<const VariableGradient *> _grad_vals;
+
+  const Real _delta_sigma;
+  const Real _delta_mob;
 
   MaterialProperty<Real> & _L;
   MaterialProperty<Real> & _A;
@@ -44,10 +51,15 @@ private:
   Real _Q;
   Real _GBMobility;
   const AnisoGBEnergyUserObject & _aniso_GB_energy;
+  bool _mobility_anisotropy;
+  bool _inclination_anisotropy;
 
   // Constants
   const Real _JtoeV;
   const Real _kb;
+
+  unsigned int _op_num;
+
 };
 
 #endif //SINTERINGCOEFFICIENTSANISO_H
