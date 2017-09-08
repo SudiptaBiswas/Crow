@@ -30,7 +30,9 @@ Real
 InterfaceAreaPostprocessor::computeQpIntegral()
 {
   Real c = 0.0;
-  if (_u[_qp] > 0.1 && _u[_qp] < 0.95)
+  // if (_u[_qp] > 0.1 && _u[_qp] < 0.95)
+  //   c = 1.0;
+  if (_u[_qp] > 0.45 && _u[_qp] < 0.55)
     c = 1.0;
   return c;
 }
