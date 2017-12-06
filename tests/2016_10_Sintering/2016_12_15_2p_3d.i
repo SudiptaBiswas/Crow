@@ -2,6 +2,7 @@
   var_name_base = gr
   op_num = 2.0
   block = 0
+  int_width = 2.0
 []
 
 [Mesh]
@@ -86,6 +87,7 @@
   [./PolycrystalSinteringKernel]
     c = c
     consider_rigidbodymotion = false
+    anisotropic = false
   [../]
 []
 
@@ -169,9 +171,10 @@
     Dsurf0 = 1.41e-5
     Dgb0 = 4.0e-4
     Vm = 1.58e-29
-    bulkindex = 1.0
-    surfindex = 1.0
-    gbindex = 1.0
+    Qvc = 2.0
+    #bulkindex = 1.0
+    #surfindex = 1.0
+    #gbindex = 1.0
     kb = 8.617343e-5
     JtoeV = 6.24150974e18
     c = c
@@ -185,8 +188,8 @@
   [./constant_mat]
     type = GenericConstantMaterial
     block = 0
-    prop_names = '  A       B     L   kappa_op     kappa_c'
-    prop_values = '7.9891 0.8488 1.0  15.9158      21.7673    '
+    prop_names = '  A       B     L   kappa_op  kappa_c'
+    prop_values = '25.436 2.466 10.68  7.397     13.951    '
   [../]
 []
 

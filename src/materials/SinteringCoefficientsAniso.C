@@ -23,7 +23,7 @@ InputParameters validParams<SinteringCoefficientsAniso>()
       "delta_sigma", 0.1, "factor determining inclination dependence of GB energy");
   params.addParam<Real>(
       "delta_mob", 0.1, "factor determining inclination dependence of GB mobility");
-params.addRequiredParam<UserObjectName>("gbenergymap", "AnisoGBEnergyUserObject holding the grain boundary energy mapping");
+  params.addRequiredParam<UserObjectName>("gbenergymap", "AnisoGBEnergyUserObject holding the grain boundary energy mapping");
   params.addParam<bool>("mobility_anisotropy", false, "GB mobility input in m^4/(J*s), that overrides the temperature dependent calculation");
   params.addParam<bool>("inclination_anisotropy",false,
                                 "The GB anisotropy inclination would be considered if true");
@@ -131,15 +131,16 @@ SinteringCoefficientsAniso::computeProperties()
 
           Val = (100000.0 * ((*_vals[m])[_qp]) * ((*_vals[m])[_qp]) + 0.01) *
                 (100000.0 * ((*_vals[n])[_qp]) * ((*_vals[n])[_qp]) + 0.01);
+          // Val = ((*_vals[m])[_qp]) * ((*_vals[m])[_qp]) * ((*_vals[n])[_qp]) * ((*_vals[n])[_qp]);
 
           sum_val += Val;
           // Following comes from substituting Eq. (36c) from the paper into (36b)
           sum_L += Val * f_mob * L_iso;
-          sum_sigma += Val * f_sigma * GB_energy;
+          // sum_sigma += Val * f_sigma * GB_energy;
         }
 
       _L[_qp] = sum_L / sum_val;
-       GB_energy = sum_sigma / sum_val;
+      //  GB_energy = sum_sigma / sum_val;
     }
     else
       _L[_qp] = L_iso;

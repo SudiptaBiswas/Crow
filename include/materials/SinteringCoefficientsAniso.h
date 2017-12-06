@@ -37,6 +37,8 @@ protected:
   MaterialProperty<Real> & _B;
   MaterialProperty<Real> & _kappa_c;
   MaterialProperty<Real> & _kappa_op;
+  // MaterialProperty<Real> & _sum_val;
+  // MaterialProperty<Real> & _f_mob;
 
   Real _int_width;
   Real _time_scale;

@@ -55,23 +55,23 @@ ElectricBCUO::execute()
     if (_grad_c[_qp].norm() > 1.0e-10)
       ns = _grad_c[_qp] / _grad_c[_qp].norm();
 
-      switch (_bc_type)
-      {
-        case 0: // dirichlet
-          if (ns(0) - 1.0 < tol || ns(1) - 1.0 < tol || ns(2) - 1.0 > tol)
-            _value = _c[_qp] - _func.value(_t, _q_point[_qp]);
+    switch (_bc_type)
+    {
+      case 0: // dirichlet
+        if (ns(0) - 1.0 < tol || ns(1) - 1.0 < tol || ns(2) - 1.0 > tol)
+          _value = _c[_qp] - _func.value(_t, _q_point[_qp]);
 
-          break;
+        break;
 
-        case 1: // Neumann
-          if (ns(0) - 1.0 < tol || ns(1) - 1.0 < tol || ns(2) - 1.0 > tol)
-            _value = - _func.value(_t, _q_point[_qp]);
+      case 1: // Neumann
+        if (ns(0) - 1.0 < tol || ns(1) - 1.0 < tol || ns(2) - 1.0 > tol)
+          _value = - _func.value(_t, _q_point[_qp]);
 
-          break;
+        break;
 
-        default:
-          mooseError("Incorrect BC type for electrical BC.");
-      }
+      default:
+        mooseError("Incorrect BC type for electrical BC.");
+    }
   }
 }
 
