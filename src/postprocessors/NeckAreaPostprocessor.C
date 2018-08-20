@@ -14,26 +14,23 @@
 
 #include "NeckAreaPostprocessor.h"
 
-template<>
-InputParameters validParams<NeckAreaPostprocessor>()
-{
+registerMooseObject("CrowApp", NeckAreaPostprocessor);
+
+template <> InputParameters validParams<NeckAreaPostprocessor>() {
   InputParameters params = validParams<ElementIntegralPostprocessor>();
-  params.addRequiredCoupledVarWithAutoBuild("v", "var_name_base", "op_num", "Array of coupled variables");
+  params.addRequiredCoupledVarWithAutoBuild("v", "var_name_base", "op_num",
+                                            "Array of coupled variables");
   return params;
 }
 
-NeckAreaPostprocessor::NeckAreaPostprocessor(const InputParameters & parameters) :
-    ElementIntegralPostprocessor(parameters),
-    _op_num(coupledComponents("v")),
-    _vals(_op_num)
-{
+NeckAreaPostprocessor::NeckAreaPostprocessor(const InputParameters &parameters)
+    : ElementIntegralPostprocessor(parameters), _op_num(coupledComponents("v")),
+      _vals(_op_num) {
   for (unsigned int i = 0; i < _op_num; ++i)
     _vals[i] = &coupledValue("v", i);
 }
 
-Real
-NeckAreaPostprocessor::computeQpIntegral()
-{
+Real NeckAreaPostprocessor::computeQpIntegral() {
   Real gb = 0.0;
   for (unsigned int i = 0; i < _op_num; ++i)
     for (unsigned int j = 0; j < _op_num; ++j)

@@ -18,20 +18,18 @@
 #include "AuxKernel.h"
 #include "ConservedNoiseBase.h"
 
-//Forward Declarations
+// Forward Declarations
 class RandomVoidSourceAux;
 class RandomElementalUserObject;
 
-template<>
-InputParameters validParams<RandomVoidSourceAux>();
+template <> InputParameters validParams<RandomVoidSourceAux>();
 
 /**
  * An AuxKernel that uses built-in Random number generation.
  */
-class RandomVoidSourceAux : public AuxKernel
-{
+class RandomVoidSourceAux : public AuxKernel {
 public:
-  RandomVoidSourceAux(const InputParameters & params);
+  RandomVoidSourceAux(const InputParameters &params);
 
   virtual ~RandomVoidSourceAux();
 
@@ -42,4 +40,4 @@ protected:
   bool _generate_ints;
 };
 
-#endif //RANDOMAUX_H
+#endif // RANDOMAUX_H

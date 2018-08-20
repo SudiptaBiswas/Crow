@@ -1,6 +1,6 @@
 #include "PFElasticEnergyAux.h"
 
-//#include "SymmTensor.h"
+registerMooseObject("CrowApp", PFElasticEnergyAux);
 
 template<>
 InputParameters validParams<PFElasticEnergyAux>()

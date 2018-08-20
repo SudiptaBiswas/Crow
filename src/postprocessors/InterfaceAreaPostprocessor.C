@@ -14,21 +14,18 @@
 
 #include "InterfaceAreaPostprocessor.h"
 
-template<>
-InputParameters validParams<InterfaceAreaPostprocessor>()
-{
+registerMooseObject("CrowApp", InterfaceAreaPostprocessor);
+
+template <> InputParameters validParams<InterfaceAreaPostprocessor>() {
   InputParameters params = validParams<ElementIntegralVariablePostprocessor>();
   return params;
 }
 
-InterfaceAreaPostprocessor::InterfaceAreaPostprocessor(const InputParameters & parameters) :
-    ElementIntegralVariablePostprocessor(parameters)
-{
-}
+InterfaceAreaPostprocessor::InterfaceAreaPostprocessor(
+    const InputParameters &parameters)
+    : ElementIntegralVariablePostprocessor(parameters) {}
 
-Real
-InterfaceAreaPostprocessor::computeQpIntegral()
-{
+Real InterfaceAreaPostprocessor::computeQpIntegral() {
   Real c = 0.0;
   // if (_u[_qp] > 0.1 && _u[_qp] < 0.95)
   //   c = 1.0;

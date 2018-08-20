@@ -20,21 +20,27 @@
 // template<>
 // InputParameters validParams<ConservationCheck>()
 // {
-//   InputParameters params = validParams<ElementIntegralVariablePostprocessor>();
-//   params.addParam<Real>("translation_constant", 1.0, "constant value characterizing grain translation");
-//   params.addParam<Real>("rotation_constant", 1.0, "constant value characterizing grain rotation");
-//   params.addParam<UserObjectName>("grain_tracker_object", "userobject for getting volume and center of mass of grains");
-//   params.addParam<VectorPostprocessorName>("grain_volumes", "The feature volume VectorPostprocessorValue.");
-//   params.addParam<UserObjectName>("grain_force", "userobject for getting force and torque acting on grains");
-//   params.addCoupledVarWithAutoBuild("v", "var_name_base", "op_num", "Array of coupled variables");
-//   return params;
+//   InputParameters params =
+//   validParams<ElementIntegralVariablePostprocessor>();
+//   params.addParam<Real>("translation_constant", 1.0, "constant value
+//   characterizing grain translation");
+//   params.addParam<Real>("rotation_constant", 1.0, "constant value
+//   characterizing grain rotation");
+//   params.addParam<UserObjectName>("grain_tracker_object", "userobject for
+//   getting volume and center of mass of grains");
+//   params.addParam<VectorPostprocessorName>("grain_volumes", "The feature
+//   volume VectorPostprocessorValue.");
+//   params.addParam<UserObjectName>("grain_force", "userobject for getting
+//   force and torque acting on grains"); params.addCoupledVarWithAutoBuild("v",
+//   "var_name_base", "op_num", "Array of coupled variables"); return params;
 // }
 //
 // ConservationCheck::ConservationCheck(const InputParameters & parameters) :
 //     ElementIntegralVariablePostprocessor(parameters),
 //     VectorPostprocessorInterface(this),
 //     _grain_tracker(getUserObject<GrainTrackerInterface>("grain_tracker_object")),
-//     _grain_volumes(getVectorPostprocessorValue("grain_volumes", "feature_volumes")),
+//     _grain_volumes(getVectorPostprocessorValue("grain_volumes",
+//     "feature_volumes")),
 //     _grain_force_torque(getUserObject<GrainForceAndTorqueInterface>("grain_force")),
 //     _grain_forces(_grain_force_torque.getForceValues()),
 //     _grain_torques(_grain_force_torque.getTorqueValues()),
@@ -57,11 +63,12 @@
 //     auto grain_id = _grain_ids[i];
 //     if (grain_id != FeatureFloodCount::invalid_id)
 //     {
-//       mooseAssert(grain_id < _grain_volumes.size(), "grain_id out of bounds");
-//       const auto volume = _grain_volumes[grain_id];
-//       const auto centroid = _grain_tracker.getGrainCentroid(grain_id);
-//       const auto force = _mt / volume * _grain_forces[grain_id];
-//       const auto torque = _mr / volume * (_grain_torques[grain_id].cross(_current_elem->centroid() - centroid));
+//       mooseAssert(grain_id < _grain_volumes.size(), "grain_id out of
+//       bounds"); const auto volume = _grain_volumes[grain_id]; const auto
+//       centroid = _grain_tracker.getGrainCentroid(grain_id); const auto force
+//       = _mt / volume * _grain_forces[grain_id]; const auto torque = _mr /
+//       volume * (_grain_torques[grain_id].cross(_current_elem->centroid() -
+//       centroid));
 //
 //       _velocity_advection += (force + torque) * (*_vals[i])[_qp];
 //     }
