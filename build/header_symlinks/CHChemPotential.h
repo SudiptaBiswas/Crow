@@ -1,0 +1,1 @@
+/Users/bisws/Programs/Crow/include/kernels/CHChemPotential.h
