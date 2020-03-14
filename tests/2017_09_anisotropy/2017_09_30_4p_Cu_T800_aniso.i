@@ -210,14 +210,14 @@
 []
 
 [BCs]
-  [./flux]
-    type = CahnHilliardFluxBC
-    variable = w
-    boundary = 'top bottom left right'
-    flux = '0 0 0'
-    mob_name = M
-    args = 'c'
-  [../]
+  # [./flux]
+  #   type = CahnHilliardFluxBC
+  #   variable = w
+  #   boundary = 'top bottom left right'
+  #   flux = '0 0 0'
+  #   mob_name = M
+  #   args = 'c'
+  # [../]
 []
 
 [Materials]

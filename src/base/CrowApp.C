@@ -2,7 +2,6 @@
 #include "CrowApp.h"
 #include "Moose.h"
 #include "MooseSyntax.h"
-// #include "ModulesApp.h"
 
 #include "HeatConductionApp.h"
 #include "MiscApp.h"
@@ -11,11 +10,9 @@
 
 #ifdef MARMOT_ENABLED
 #include "MarmotApp.h"
-#include "MarmotSyntax.h"
 #endif
 
 #include "CrowRevision.h"
-// #include "CrowSyntax.h"
 
 template <> InputParameters validParams<CrowApp>() {
   InputParameters params = validParams<MooseApp>();
@@ -25,67 +22,13 @@ template <> InputParameters validParams<CrowApp>() {
 registerKnownLabel("CrowApp");
 
 CrowApp::CrowApp(const InputParameters &parameters) : MooseApp(parameters) {
-
-  Moose::registerObjects(_factory);
-  CrowApp::registerObjects(_factory);
-
-  Moose::associateSyntax(_syntax, _action_factory);
-  CrowApp::associateSyntax(_syntax, _action_factory);
-
-  Moose::registerExecFlags(_factory);
-  CrowApp::registerExecFlags(_factory);
-
-  //   PhaseFieldApp::registerObjects(_factory);
-  //   TensorMechanicsApp::registerObjects(_factory);
-  //   HeatConductionApp::registerObjects(_factory);
-  //   MiscApp::registerObjects(_factory);
-  //
-  //   PhaseFieldApp::associateSyntax(_syntax, _action_factory);
-  //   TensorMechanicsApp::associateSyntax(_syntax, _action_factory);
-  //   HeatConductionApp::associateSyntax(_syntax, _action_factory);
-  //   MiscApp::associateSyntax(_syntax, _action_factory);
-  //
-  // #ifdef MARMOT_ENABLED
-  //   MarmotApp::registerObjects(_factory);
-  //   Marmot::associateSyntax(_syntax, _action_factory);
-  // #endif
-
-  CrowApp::associateSyntax(_syntax, _action_factory);
+  CrowApp::registerAll(_factory, _action_factory, _syntax);
 }
 
 CrowApp::~CrowApp() {}
 
-extern "C" void CrowApp__registerApps() { CrowApp::registerApps(); }
-void CrowApp::registerApps() { registerApp(CrowApp); }
-
-extern "C" void CrowApp__registerObjects(Factory &factory) {
-  CrowApp::registerObjects(factory);
-}
-void CrowApp::registerObjects(Factory &factory) {
-  PhaseFieldApp::registerObjects(factory);
-  TensorMechanicsApp::registerObjects(factory);
-  HeatConductionApp::registerObjects(factory);
-  MiscApp::registerObjects(factory);
-#ifdef MARMOT_ENABLED
-  MarmotApp::registerObjects(factory);
-#endif
-  Registry::registerObjectsTo(factory, {"CrowApp"});
-}
-
-extern "C" void CrowApp__associateSyntax(Syntax &syntax,
-                                         ActionFactory &action_factory) {
-  CrowApp::associateSyntax(syntax, action_factory);
-}
-void CrowApp::associateSyntax(Syntax &syntax, ActionFactory &action_factory) {
-  PhaseFieldApp::associateSyntax(syntax, action_factory);
-  TensorMechanicsApp::associateSyntax(syntax, action_factory);
-  HeatConductionApp::associateSyntax(syntax, action_factory);
-  MiscApp::associateSyntax(syntax, action_factory);
-#ifdef MARMOT_ENABLED
-  Marmot::associateSyntax(syntax, action_factory);
-#endif
-  Registry::registerActionsTo(action_factory, {"CrowApp"});
-
+void CrowApp::associateSyntax(Syntax &syntax,
+                              ActionFactory & /*action_factory*/) {
   registerSyntax("PolycrystalSinteringKernelAction",
                  "Kernels/PolycrystalSinteringKernel");
   registerSyntax("PolycrystalSinteringMaterialAction",
@@ -97,17 +40,28 @@ void CrowApp::associateSyntax(Syntax &syntax, ActionFactory &action_factory) {
                  "ICs/PolycrystalICs/MultiSmoothParticleIC");
 }
 
-// External entry point for dynamic execute flag registration
-extern "C" void CrowApp__registerExecFlags(Factory &factory) {
-  CrowApp::registerExecFlags(factory);
-}
+// External entry point for dynamic application loading
+extern "C" void CrowApp__registerApps() { CrowApp::registerApps(); }
+void CrowApp::registerApps() { registerApp(CrowApp); }
 
-void CrowApp::registerExecFlags(Factory &factory) {
-  HeatConductionApp::registerExecFlags(factory);
-  MiscApp::registerExecFlags(factory);
-  PhaseFieldApp::registerExecFlags(factory);
-  TensorMechanicsApp::registerExecFlags(factory);
-  // #ifdef MARMOT_ENABLED
-  //   Marmot::registerExecFlags(factory);
-  // #endif
+// External entry point for object registration
+extern "C" void CrowApp__registerAll(Factory &factory,
+                                     ActionFactory &action_factory,
+                                     Syntax &syntax) {
+  CrowApp::registerAll(factory, action_factory, syntax);
+}
+void CrowApp::registerAll(Factory &factory, ActionFactory &action_factory,
+                          Syntax &syntax) {
+  Registry::registerObjectsTo(factory, {"CrowApp"});
+  Registry::registerActionsTo(action_factory, {"CrowApp"});
+  CrowApp::associateSyntax(syntax, action_factory);
+
+  PhaseFieldApp::registerAll(factory, action_factory, syntax);
+  TensorMechanicsApp::registerAll(factory, action_factory, syntax);
+  HeatConductionApp::registerAll(factory, action_factory, syntax);
+  MiscApp::registerAll(factory, action_factory, syntax);
+
+#ifdef MARMOT_ENABLED
+  MarmotApp::registerAll(factory, action_factory, syntax);
+#endif
 }

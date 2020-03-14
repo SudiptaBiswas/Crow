@@ -1,6 +1,7 @@
 [GlobalParams]
   var_name_base = gr
   op_num = 2.0
+  int_width = 2.0
   #en_ratio = 1
 []
 
@@ -25,6 +26,42 @@
   [./w]
   [../]
   [./PolycrystalVariables]
+  [../]
+[]
+
+[ICs]
+  [./ic_gr1]
+    int_width = 2.0
+    x1 = 25.0
+    y1 = 10.0
+    radius = 7.4
+    outvalue = 0.0
+    variable = gr1
+    invalue = 1.0
+    type = SmoothCircleIC
+  [../]
+  [./multip]
+    x_positions = '10.0 25.0'
+    int_width = 2.0
+    z_positions = '0 0'
+    y_positions = '10.0 10.0 '
+    radii = '7.4 7.4'
+    3D_spheres = false
+    outvalue = 0.001
+    variable = c
+    invalue = 0.999
+    type = SpecifiedSmoothCircleIC
+    block = 0
+  [../]
+  [./ic_gr0]
+    int_width = 2.0
+    x1 = 10.0
+    y1 = 10.0
+    radius = 7.4
+    outvalue = 0.0
+    variable = gr0
+    invalue = 1.0
+    type = SmoothCircleIC
   [../]
 []
 
@@ -71,6 +108,7 @@
   [./PolycrystalSinteringKernel]
     c = c
     consider_rigidbodymotion = false
+    anisotropic = false
     grain_force = grain_force
     grain_tracker_object = grain_center
     grain_volumes = grain_volumes
@@ -115,14 +153,14 @@
 []
 
 [BCs]
-  [./flux]
-    type = CahnHilliardFluxBC
-    variable = w
-    boundary = 'top bottom left right'
-    flux = '0 0 0'
-    mob_name = D
-    args = 'c'
-  [../]
+  # [./flux]
+  #   type = CahnHilliardFluxBC
+  #   variable = w
+  #   boundary = 'top bottom left right'
+  #   flux = '0 0 0'
+  #   mob_name = D
+  #   args = 'c'
+  # [../]
 []
 
 [Functions]
@@ -198,10 +236,10 @@
   [./tstep]
     type = TimestepSize
   [../]
-  [./run_time]
-    type = RunTime
-    time_type = active
-  [../]
+  # [./run_time]
+  #   type = RunTime
+  #   time_type = active
+  # [../]
   [./int_area]
     type = InterfaceAreaPostprocessor
     variable = c
@@ -278,42 +316,6 @@
   [./exodus]
     type = Exodus
     elemental_as_nodal = true
-  [../]
-[]
-
-[ICs]
-  [./ic_gr1]
-    int_width = 2.0
-    x1 = 25.0
-    y1 = 10.0
-    radius = 7.4
-    outvalue = 0.0
-    variable = gr1
-    invalue = 1.0
-    type = SmoothCircleIC
-  [../]
-  [./multip]
-    x_positions = '10.0 25.0'
-    int_width = 2.0
-    z_positions = '0 0'
-    y_positions = '10.0 10.0 '
-    radii = '7.4 7.4'
-    3D_spheres = false
-    outvalue = 0.001
-    variable = c
-    invalue = 0.999
-    type = SpecifiedSmoothCircleIC
-    block = 0
-  [../]
-  [./ic_gr0]
-    int_width = 2.0
-    x1 = 10.0
-    y1 = 10.0
-    radius = 7.4
-    outvalue = 0.0
-    variable = gr0
-    invalue = 1.0
-    type = SmoothCircleIC
   [../]
 []
 

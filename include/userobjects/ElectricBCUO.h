@@ -7,43 +7,40 @@
 #ifndef ELECTRICBCUO_H
 #define ELECTRICBCUO_H
 
-#include "ElementUserObject.h"
 #include "DerivativeMaterialInterface.h"
+#include "ElementUserObject.h"
 #include "Function.h"
 
-//Forward Declarations
+// Forward Declarations
 class ElectricBCUO;
 
-template<>
-InputParameters validParams<ElectricBCUO>();
+template <> InputParameters validParams<ElectricBCUO>();
 
 /**
  * This class is here to get the force and torque acting on a grain
  */
-class ElectricBCUO :
-    public DerivativeMaterialInterface<ElementUserObject>
-{
+class ElectricBCUO : public DerivativeMaterialInterface<ElementUserObject> {
 public:
-  ElectricBCUO(const InputParameters & parameters);
+  ElectricBCUO(const InputParameters &parameters);
 
   virtual void initialize();
   virtual void execute();
   virtual void finalize();
-  virtual void threadJoin(const UserObject & y);
+  virtual void threadJoin(const UserObject &y);
 
-  virtual const Real & getBCValues() const;
+  virtual const Real &getBCValues() const;
 
 protected:
   unsigned int _qp;
 
   unsigned int _c_var;
-  const VariableValue & _c;
-  const VariableGradient & _grad_c;
+  const VariableValue &_c;
+  const VariableGradient &_grad_c;
 
-  Function & _func;
+  const Function &_func;
   MooseEnum _bc_type;
 
   Real _value;
 };
 
-#endif //ELECTRICBCUO_H
+#endif // ELECTRICBCUO_H
