@@ -1,2 +1,0 @@
-{"ndof": 8, "demangled": true, "vars": [{"name": "c", "subdomains": [{"id": 0, "kernels": [{"name": "cres", "type": "SplitCHParsed"}], "dofs": [0, 2, 4, 6]}]}, {"name": "w", "subdomains": [{"id": 0, "kernels": [{"name": "wres", "type": "SplitCHWRes"}, {"name": "time", "type": "CoupledTimeDerivative"}], "dofs": [1, 3, 5, 7]}]}]}
-

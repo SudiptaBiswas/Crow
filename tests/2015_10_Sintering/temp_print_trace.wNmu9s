@@ -1,9 +1,0 @@
-0x00007fff82fd559a in ?? () from /usr/lib/system/libsystem_kernel.dylib
-#0  0x00007fff82fd559a in ?? () from /usr/lib/system/libsystem_kernel.dylib
-#1  0x00007fff85dedfdd in system () from /usr/lib/system/libsystem_c.dylib
-#2  0x000000010564c3e3 in libMesh::print_trace(std::__1::basic_ostream<char, std::__1::char_traits<char> >&) () from /Users/bisws/projects/moose/scripts/../libmesh/installed/lib/libmesh_opt.0.dylib
-#3  0x000000010511b4cc in MooseUtils::checkFileReadable(std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> > const&, bool, bool) () from /Users/bisws/projects/moose/framework/libmoose-opt.0.dylib
-#4  0x0000000104fe2578 in Parser::parse(std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> > const&) () from /Users/bisws/projects/moose/framework/libmoose-opt.0.dylib
-#5  0x0000000104ddf12f in MooseApp::setupOptions() () from /Users/bisws/projects/moose/framework/libmoose-opt.0.dylib
-#6  0x0000000104de2426 in MooseApp::run() () from /Users/bisws/projects/moose/framework/libmoose-opt.0.dylib
-#7  0x0000000104377568 in main ()
