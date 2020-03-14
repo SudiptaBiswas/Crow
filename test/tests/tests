@@ -1,0 +1,12 @@
+[Tests]
+  [./test1]
+    type = 'Exodiff'
+    input = 'sintering_test1_isomob.i'
+    exodiff = 'sintering_test1_isomob_exodus.e sintering_test1_isomob_exodus.e-s011 sintering_test1_isomob_exodus.e-s022 sintering_test1_isomob_exodus.e-s033'
+  [../]
+  [./test2]
+    type = 'CSVDiff'
+    input = 'sintering_test1_isomob.i'
+    csvdiff = 'sintering_test1_isomob_out.csv'
+  [../]
+[]
