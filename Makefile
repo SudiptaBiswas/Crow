@@ -29,12 +29,12 @@ include $(MOOSE_DIR)/modules/modules.mk
 ###############################################################################
 # MARMOT (optional)
 #MARMOT_DIR          ?= $(CURDIR)/marmot
-MARMOT_DIR          ?= $(shell dirname `pwd`)/marmot
-ifneq ($(wildcard $(MARMOT_DIR)/Makefile),)
-  APPLICATION_DIR    := $(MARMOT_DIR)
-  APPLICATION_NAME   := marmot
-  include            $(FRAMEWORK_DIR)/app.mk
-endif
+# MARMOT_DIR          ?= $(shell dirname `pwd`)/marmot
+# ifneq ($(wildcard $(MARMOT_DIR)/Makefile),)
+#   APPLICATION_DIR    := $(MARMOT_DIR)
+#   APPLICATION_NAME   := marmot
+#   include            $(FRAMEWORK_DIR)/app.mk
+# endif
 
 # dep apps
 APPLICATION_DIR    := $(CURDIR)

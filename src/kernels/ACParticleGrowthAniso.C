@@ -1,5 +1,5 @@
 #include "ACParticleGrowthAniso.h"
-#include "AnisoGBEnergyUserObject.h"
+// #include "AnisoGBEnergyUserObject.h"
 
 registerMooseObject("CrowApp", ACParticleGrowthAniso);
 
@@ -14,8 +14,8 @@ template <> InputParameters validParams<ACParticleGrowthAniso>() {
                         "Length scale in m, where default is 1 nm");
   params.addRequiredParam<unsigned int>(
       "op", "The order parameter number this is acting on");
-  params.addRequiredParam<UserObjectName>(
-      "gbenergymap", "Where the map of the energies are held");
+  // params.addRequiredParam<UserObjectName>(
+  //     "gbenergymap", "Where the map of the energies are held");
   return params;
 }
 
@@ -23,7 +23,7 @@ ACParticleGrowthAniso::ACParticleGrowthAniso(const InputParameters &parameters)
     : ACBulk<Real>(parameters), _c(coupledValue("c")), _c_var(coupled("c")),
       _op(getParam<unsigned int>("op")), _op_num(coupledComponents("v")),
       _vals(_op_num), _grad_vals(_op_num), _vals_var(_op_num),
-      _aniso_GB_energy(getUserObject<AnisoGBEnergyUserObject>("gbenergymap")),
+      // _aniso_GB_energy(getUserObject<AnisoGBEnergyUserObject>("gbenergymap")),
       _length_scale(getParam<Real>("length_scale")),
       _int_width(getParam<Real>("int_width")),
       _ncrys(coupledComponents("v")) // determine number of grains from the
@@ -49,61 +49,62 @@ Real ACParticleGrowthAniso::computeDFDOP(PFFunctionType type) {
   Real Dsigma_Deta = 0.0;
   Real D2sigma_Deta2 = 0.0;
 
-  const AnisoGBEnergyUserObject::SigmaIJMap &gb_energy_map =
-      _aniso_GB_energy.getGBEnergies(_current_elem->id());
-  if (gb_energy_map.size() >= 2) {
-    std::set<unsigned int> op_set;
-    for (AnisoGBEnergyUserObject::SigmaIJMap::const_iterator it =
-             gb_energy_map.begin();
-         it != gb_energy_map.end(); ++it) {
-      unsigned int op1 = (it->first).first;
-      unsigned int op2 = (it->first).second;
-      op_set.insert(op1);
-      op_set.insert(op2);
-      Real sigmaij = it->second;
-      SumEtaij += (*_vals[op1])[_qp] * (*_vals[op1])[_qp] * (*_vals[op2])[_qp] *
-                  (*_vals[op2])[_qp];
-      SumEtaSigmaij += sigmaij * (*_vals[op1])[_qp] * (*_vals[op1])[_qp] *
-                       (*_vals[op2])[_qp] * (*_vals[op2])[_qp];
-    }
-    if (op_set.count(_op)) {
-      for (std::set<unsigned int>::const_iterator it = op_set.begin();
-           it != op_set.end(); ++it) {
-        if (*it != _op) {
-          SumEtaj += (*_vals[*it])[_qp] * (*_vals[*it])[_qp];
-          SumEtaj3 +=
-              (*_vals[*it])[_qp] * (*_vals[*it])[_qp] * (*_vals[*it])[_qp];
-          SumGradEta += ((*_grad_vals[*it])[_qp] * (*_grad_vals[*it])[_qp]);
+  // const AnisoGBEnergyUserObject::SigmaIJMap &gb_energy_map =
+  //     _aniso_GB_energy.getGBEnergies(_current_elem->id());
+  // if (gb_energy_map.size() >= 2) {
+  //   std::set<unsigned int> op_set;
+  //   for (AnisoGBEnergyUserObject::SigmaIJMap::const_iterator it =
+  //            gb_energy_map.begin();
+  //        it != gb_energy_map.end(); ++it) {
+  //     unsigned int op1 = (it->first).first;
+  //     unsigned int op2 = (it->first).second;
+  //     op_set.insert(op1);
+  //     op_set.insert(op2);
+  //     Real sigmaij = it->second;
+  //     SumEtaij += (*_vals[op1])[_qp] * (*_vals[op1])[_qp] *
+  //     (*_vals[op2])[_qp] *
+  //                 (*_vals[op2])[_qp];
+  //     SumEtaSigmaij += sigmaij * (*_vals[op1])[_qp] * (*_vals[op1])[_qp] *
+  //                      (*_vals[op2])[_qp] * (*_vals[op2])[_qp];
+  //   }
+  //   if (op_set.count(_op)) {
+  //     for (std::set<unsigned int>::const_iterator it = op_set.begin();
+  //          it != op_set.end(); ++it) {
+  //       if (*it != _op) {
+  //         SumEtaj += (*_vals[*it])[_qp] * (*_vals[*it])[_qp];
+  //         SumEtaj3 +=
+  //             (*_vals[*it])[_qp] * (*_vals[*it])[_qp] * (*_vals[*it])[_qp];
+  //         SumGradEta += ((*_grad_vals[*it])[_qp] * (*_grad_vals[*it])[_qp]);
+  //
+  //         Real sigmaiop;
+  //         // The lower order parameter is first in the pair TODO: check if
+  //         stuff
+  //         // was found!!!
+  //         if (_op > *it)
+  //           sigmaiop =
+  //               gb_energy_map
+  //                   .find(std::pair<unsigned int, unsigned int>(*it, _op))
+  //                   ->second;
+  //         else
+  //           sigmaiop =
+  //               gb_energy_map
+  //                   .find(std::pair<unsigned int, unsigned int>(_op, *it))
+  //                   ->second;
+  //
+  //         SumEtaSigmaj += sigmaiop * (*_vals[*it])[_qp] * (*_vals[*it])[_qp];
+  //       }
+  //     }
 
-          Real sigmaiop;
-          // The lower order parameter is first in the pair TODO: check if stuff
-          // was found!!!
-          if (_op > *it)
-            sigmaiop =
-                gb_energy_map
-                    .find(std::pair<unsigned int, unsigned int>(*it, _op))
-                    ->second;
-          else
-            sigmaiop =
-                gb_energy_map
-                    .find(std::pair<unsigned int, unsigned int>(_op, *it))
-                    ->second;
-
-          SumEtaSigmaj += sigmaiop * (*_vals[*it])[_qp] * (*_vals[*it])[_qp];
-        }
-      }
-
-      Dsigma_Deta = 2.0 * _u[_qp] *
-                    (SumEtaSigmaj * SumEtaij - SumEtaj * SumEtaSigmaij) /
-                    (SumEtaij * SumEtaij);
-      D2sigma_Deta2 = 2.0 *
-                      (SumEtaSigmaj * SumEtaij - SumEtaj * SumEtaSigmaij) /
-                      (SumEtaij * SumEtaij);
-      const Real JtoeV = 6.24150974e18; // joule to eV conversion
-      Dsigma_Deta *= JtoeV * (_length_scale * _length_scale);   // eV/nm^2
-      D2sigma_Deta2 *= JtoeV * (_length_scale * _length_scale); // eV/nm^2
-    }
-  }
+  Dsigma_Deta = 2.0 * _u[_qp] *
+                (SumEtaSigmaj * SumEtaij - SumEtaj * SumEtaSigmaij) /
+                (SumEtaij * SumEtaij);
+  D2sigma_Deta2 = 2.0 * (SumEtaSigmaj * SumEtaij - SumEtaj * SumEtaSigmaij) /
+                  (SumEtaij * SumEtaij);
+  const Real JtoeV = 6.24150974e18; // joule to eV conversion
+  Dsigma_Deta *= JtoeV * (_length_scale * _length_scale);   // eV/nm^2
+  D2sigma_Deta2 *= JtoeV * (_length_scale * _length_scale); // eV/nm^2
+  // }
+  // }
   // Calcualte either the residual or jacobian of the grain growth free energy
   switch (type) {
   case Residual:
@@ -138,8 +139,8 @@ Real ACParticleGrowthAniso::computeQpOffDiagJacobian(unsigned int /*jvar*/) {
   // if (jvar == _vals_var[i])
   //{
   // Real dSumEtaj = 2.0 * (*_vals[i])[_qp] * _phi[_j][_qp]; //Derivative of
-  // SumEtaj  Real dDFDOP =  12.0 * _B[_qp] * _u[_qp] * dSumEtaj;  return _L[_qp] *
-  // _test[_i][_qp] * dDFDOP;
+  // SumEtaj  Real dDFDOP =  12.0 * _B[_qp] * _u[_qp] * dSumEtaj;  return
+  // _L[_qp] * _test[_i][_qp] * dDFDOP;
   //}
 
   return 0.0;
