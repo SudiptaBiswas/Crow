@@ -35,9 +35,9 @@ template <> InputParameters validParams<SinteringCoefficientsAniso>() {
   params.addParam<Real>(
       "delta_mob", 0.1,
       "factor determining inclination dependence of GB mobility");
-  params.addRequiredParam<UserObjectName>(
-      "gbenergymap",
-      "AnisoGBEnergyUserObject holding the grain boundary energy mapping");
+  // params.addRequiredParam<UserObjectName>(
+  //     "gbenergymap",
+  //     "AnisoGBEnergyUserObject holding the grain boundary energy mapping");
   params.addParam<bool>("mobility_anisotropy", false,
                         "GB mobility input in m^4/(J*s), that overrides the "
                         "temperature dependent calculation");
@@ -66,7 +66,7 @@ SinteringCoefficientsAniso::SinteringCoefficientsAniso(
       _surface_energy(getParam<Real>("surface_energy")),
       _GBmob0(getParam<Real>("GBmob0")), _Q(getParam<Real>("Qgbm")),
       _GBMobility(getParam<Real>("GBMobility")),
-      _aniso_GB_energy(getUserObject<AnisoGBEnergyUserObject>("gbenergymap")),
+      // _aniso_GB_energy(getUserObject<AnisoGBEnergyUserObject>("gbenergymap")),
       _mobility_anisotropy(getParam<bool>("mobility_anisotropy")),
       _inclination_anisotropy(getParam<bool>("inclination_anisotropy")),
       _JtoeV(6.24150974e18), // Joule to eV conversion
@@ -89,10 +89,10 @@ void SinteringCoefficientsAniso::computeProperties() {
   if (_energy_unit == 0)
     energy_scale *= _JtoeV;
 
-  Real GB_energy = _aniso_GB_energy.getWeightedEnergy(_current_elem->id());
+  // Real GB_energy = _aniso_GB_energy.getWeightedEnergy(_current_elem->id());
 
-  GB_energy *= (_JtoeV * _length_scale * _length_scale /
-                energy_scale); // Non-dimensionalized GB energy
+  Real GB_energy = 1.5 * (_JtoeV * _length_scale * _length_scale /
+                          energy_scale); // Non-dimensionalized GB energy
   const Real surface_energy =
       _surface_energy / energy_scale * _length_scale * _length_scale;
   const Real int_width_c = _int_width; // The interfacial width is input in the

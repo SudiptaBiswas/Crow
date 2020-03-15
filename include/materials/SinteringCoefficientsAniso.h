@@ -2,41 +2,39 @@
 #define SINTERINGCOEFFICIENTSANISO_H
 
 #include "Material.h"
-#include "AnisoGBEnergyUserObject.h"
+// #include "AnisoGBEnergyUserObject.h"
 
-//Forward Declarations
+// Forward Declarations
 class SinteringCoefficientsAniso;
 
-template<>
-InputParameters validParams<SinteringCoefficientsAniso>();
+template <> InputParameters validParams<SinteringCoefficientsAniso>();
 
 /**
- * Calculated vacancy and interstitial properties for a given material.  No defaults.
- * The temperature must be in Kelvin
+ * Calculated vacancy and interstitial properties for a given material.  No
+ * defaults. The temperature must be in Kelvin
  */
-class SinteringCoefficientsAniso : public Material
-{
+class SinteringCoefficientsAniso : public Material {
 public:
-  SinteringCoefficientsAniso(const InputParameters & parameters);
+  SinteringCoefficientsAniso(const InputParameters &parameters);
 
 protected:
   virtual void computeProperties();
 
-// private:
+  // private:
   const unsigned int _mesh_dimension;
 
-  const VariableValue & _T;
+  const VariableValue &_T;
   std::vector<const VariableValue *> _vals;
   std::vector<const VariableGradient *> _grad_vals;
 
   const Real _delta_sigma;
   const Real _delta_mob;
 
-  MaterialProperty<Real> & _L;
-  MaterialProperty<Real> & _A;
-  MaterialProperty<Real> & _B;
-  MaterialProperty<Real> & _kappa_c;
-  MaterialProperty<Real> & _kappa_op;
+  MaterialProperty<Real> &_L;
+  MaterialProperty<Real> &_A;
+  MaterialProperty<Real> &_B;
+  MaterialProperty<Real> &_kappa_c;
+  MaterialProperty<Real> &_kappa_op;
   // MaterialProperty<Real> & _sum_val;
   // MaterialProperty<Real> & _f_mob;
 
@@ -52,7 +50,7 @@ protected:
   Real _GBmob0;
   Real _Q;
   Real _GBMobility;
-  const AnisoGBEnergyUserObject & _aniso_GB_energy;
+  // const AnisoGBEnergyUserObject &_aniso_GB_energy;
   bool _mobility_anisotropy;
   bool _inclination_anisotropy;
 
@@ -61,7 +59,6 @@ protected:
   const Real _kb;
 
   unsigned int _op_num;
-
 };
 
-#endif //SINTERINGCOEFFICIENTSANISO_H
+#endif // SINTERINGCOEFFICIENTSANISO_H
