@@ -28,10 +28,6 @@
       type = MultiSmoothCircleIC
     #      x1 = 25
     #      y1 = 25
-
-  solve_type = 'PJFNK'
-  petsc_options_iname = '-pc_type  -sub_pc_type '
-  petsc_options_value = 'asm       lu'
       radius = 6.0
       invalue = 1.0
       outvalue = 0.0
@@ -61,10 +57,6 @@
     displacements = 'disp_x disp_y'
   [../]
 
-
-  solve_type = 'PJFNK'
-  petsc_options_iname = '-pc_type  -sub_pc_type '
-  petsc_options_value = 'asm       lu'
   [./c_res]
     type = SplitCHParsed
     variable = c
