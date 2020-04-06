@@ -36,6 +36,7 @@
     int_width = 2.0
     x1 = 25.2
     y1 = 8.0
+    z1 = 12.0
     radius = 7.0
     outvalue = 0.0
     variable = gr2
@@ -46,7 +47,8 @@
     int_width = 2.0
     x1 = 19.367
     y1 = 19.488
-    radius = 7.0
+    z1 = 18.0
+    radius = 6.0
     outvalue = 0.0
     variable = gr1
     invalue = 1.0
@@ -56,6 +58,7 @@
     int_width = 2.0
     x1 = 11.0
     y1 = 8.0
+    z1 = 14.0
     radius = 7.4
     outvalue = 0.0
     variable = gr0
@@ -67,7 +70,7 @@
     int_width = 2.0
     z_positions = '14 18 12'
     y_positions = '8.0 19.488 8.0 '
-    radii = '7.0 6.0 7.0'
+    radii = '7.4 6.0 7.0'
     3D_spheres = false
     outvalue = 0.001
     variable = c
@@ -284,7 +287,8 @@
   # Preconditioned JFNK (default)
   type = Transient
   scheme = BDF2
-  solve_type = NEWTON
+  # solve_type = NEWTON
+   solve_type = 'PJFNK'
   petsc_options_iname = '-pc_type -ksp_grmres_restart -sub_ksp_type -sub_pc_type -pc_asm_overlap'
   petsc_options_value = 'asm         31   preonly   lu      1'
   l_max_its = 20
@@ -296,8 +300,8 @@
   #dt = 0.01
   [./TimeStepper]
     type = IterationAdaptiveDT
-    dt = 0.01
-    growth_factor = 1.2
+    dt = 0.005
+    growth_factor = 1.01
   [../]
 []
 

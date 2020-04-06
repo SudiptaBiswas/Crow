@@ -7,9 +7,9 @@
   # Mesh block.  Meshes can be read in or automatically generated
   type = GeneratedMesh
   dim = 3 # Problem dimension
-  nx = 10 # Number of elements in the x-direction
-  ny = 10 # Number of elements in the y-direction
-  nz = 10
+  nx = 20 # Number of elements in the x-direction
+  ny = 20 # Number of elements in the y-direction
+  nz = 20
   xmin = 0    # minimum x-coordinate of the mesh
   xmax = 1000 # maximum x-coordinate of the mesh
   ymin = 0    # minimum y-coordinate of the mesh
@@ -22,7 +22,7 @@
 
 [GlobalParams]
   # Parameters used by several kernels that are defined globally to simplify input file
-  op_num = 15 # Number of order parameters used
+  op_num = 10 # Number of order parameters used
   var_name_base = gr # Base name of grains
   order = CONSTANT
   family = MONOMIAL
@@ -39,7 +39,7 @@
 [UserObjects]
   [./voronoi]
     type = PolycrystalVoronoi
-    grain_num = 25 # Number of grains
+    grain_num = 15 # Number of grains
     rand_seed = 10
     coloring_algorithm = jp
   [../]
@@ -109,20 +109,20 @@
   [./halo9]
   [../]
 
-  [./halo10]
-  [../]
+#   [./halo10]
+#   [../]
 
-  [./halo11]
-  [../]
+#   [./halo11]
+#   [../]
 
-  [./halo12]
-  [../]
+#   [./halo12]
+#   [../]
 
-  [./halo13]
-  [../]
+#   [./halo13]
+#   [../]
 
-  [./halo14]
-  [../]
+#   [./halo14]
+#   [../]
 
   [./proc]
   [../]
@@ -242,41 +242,41 @@
     field_display = HALOS
     flood_counter = grain_tracker
   [../]
-  [./halo10]
-    type = FeatureFloodCountAux
-    variable = halo10
-    map_index = 10
-    field_display = HALOS
-    flood_counter = grain_tracker
-  [../]
-  [./halo11]
-    type = FeatureFloodCountAux
-    variable = halo11
-    map_index = 11
-    field_display = HALOS
-    flood_counter = grain_tracker
-  [../]
-  [./halo12]
-    type = FeatureFloodCountAux
-    variable = halo12
-    map_index = 12
-    field_display = HALOS
-    flood_counter = grain_tracker
-  [../]
-  [./halo13]
-    type = FeatureFloodCountAux
-    variable = halo13
-    map_index = 13
-    field_display = HALOS
-    flood_counter = grain_tracker
-  [../]
-  [./halo14]
-    type = FeatureFloodCountAux
-    variable = halo14
-    map_index = 14
-    field_display = HALOS
-    flood_counter = grain_tracker
-  [../]
+#   [./halo10]
+#     type = FeatureFloodCountAux
+#     variable = halo10
+#     map_index = 10
+#     field_display = HALOS
+#     flood_counter = grain_tracker
+#   [../]
+#   [./halo11]
+#     type = FeatureFloodCountAux
+#     variable = halo11
+#     map_index = 11
+#     field_display = HALOS
+#     flood_counter = grain_tracker
+#   [../]
+#   [./halo12]
+#     type = FeatureFloodCountAux
+#     variable = halo12
+#     map_index = 12
+#     field_display = HALOS
+#     flood_counter = grain_tracker
+#   [../]
+#   [./halo13]
+#     type = FeatureFloodCountAux
+#     variable = halo13
+#     map_index = 13
+#     field_display = HALOS
+#     flood_counter = grain_tracker
+#   [../]
+#   [./halo14]
+#     type = FeatureFloodCountAux
+#     variable = halo14
+#     map_index = 14
+#     field_display = HALOS
+#     flood_counter = grain_tracker
+#   [../]
   [./proc]
     type = ProcessorIDAux
     variable = proc

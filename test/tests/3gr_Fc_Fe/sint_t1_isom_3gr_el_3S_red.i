@@ -1,23 +1,23 @@
 
 [Mesh]
   type = GeneratedMesh
-  dim = 3
+  dim = 2
   nx = 20
   ny = 20
-  nz = 20
+  #   nz = 0
   xmin = 0.0
   xmax = 40.0
   ymin = 0.0
   ymax = 30.0
-  zmin = 0
-  zmax = 30.0
-  elem_type = HEX8
+  # zmax = 0
+  elem_type = QUAD4
 []
 
 [GlobalParams]
+  displacements = 'disp_x disp_y'
   var_name_base = gr
   op_num = 3.0
-  int_width = 1.0
+  int_width = 2.0
   #en_ratio = 1
 []
 
@@ -29,7 +29,21 @@
   [../]
   [./PolycrystalVariables]
   [../]
+  [./disp_x]
+    order = FIRST
+    family = LAGRANGE
+  [../]
+  [./disp_y]
+    order = FIRST
+    family = LAGRANGE
+  [../]
 []
+
+# [Modules/TensorMechanics/Master/All]
+#   strain = SMALL
+#   add_variables = true
+#   generate_output = 'stress_xx stress_yy stress_zz stress_xy stress_yz stress_zx'
+# []
 
 [ICs]
   [./ic_gr2]
@@ -65,9 +79,9 @@
   [./multip]
     x_positions = '11.0 19.367  25.2'
     int_width = 2.0
-    z_positions = '14 18 12'
+    z_positions = '0 0 0'
     y_positions = '8.0 19.488 8.0 '
-    radii = '7.0 6.0 7.0'
+    radii = '7.0 7.0 7.0'
     3D_spheres = false
     outvalue = 0.001
     variable = c
@@ -96,9 +110,20 @@
     order = CONSTANT
     family = MONOMIAL
   [../]
+    [./sigma11_aux]
+    order = CONSTANT
+    family = MONOMIAL
+  [../]
+  [./sigma22_aux]
+    order = CONSTANT
+    family = MONOMIAL
+  [../]
 []
 
 [Kernels]
+  [./TensorMechanics]
+    displacements = 'disp_x disp_y'
+  [../]
   [./cres]
     type = SplitCHParsed
     variable = c
@@ -130,6 +155,7 @@
 []
 
 [AuxKernels]
+
   [./bnds]
     type = BndsCalcAux
     variable = bnds
@@ -162,6 +188,20 @@
     field_display = CENTROID
     flood_counter = grain_center
   [../]
+  [./matl_sigma11]
+    type = RankTwoAux
+    rank_two_tensor = stress
+    index_i = 0
+    index_j = 0
+    variable = sigma11_aux
+  [../]
+  [./matl_sigma22]
+    type = RankTwoAux
+    rank_two_tensor = stress
+    index_i = 1
+    index_j = 1
+    variable = sigma22_aux
+  [../]
 []
 
 [BCs]
@@ -173,6 +213,34 @@
   #   mob_name = D
   #   args = 'c'
   # [../]
+  [./bottom_y]
+    type = DirichletBC
+    variable = disp_y
+    boundary = 'bottom'
+    value = 0
+  [../]
+  [./top_y]
+    type = DirichletBC
+    variable = disp_y
+    boundary = 'top'
+    # prescribed displacement
+    # -5 will result in a compressive stress
+    #  5 will result in a tensile stress
+    value = -5
+  [../]
+  [./left_x]
+    type = DirichletBC
+    variable = disp_x
+    boundary = 'left'
+    value = 0
+  [../]
+
+  # [./right_x]
+  #   type = DirichletBC
+  #   variable = disp_x
+  #   boundary = 'right'
+  #   value = 8
+  # [../]
 []
 
 [Functions]
@@ -183,12 +251,12 @@
 []
 
 [Materials]
-  [./free_energy]
+  [./chemical_free_energy]
     type = SinteringFreeEnergy
     block = 0
     c = c
     v = 'gr0 gr1 gr2'
-    #f_name = S
+    f_name = Fc
     derivative_order = 2
     #outputs = console
   [../]
@@ -205,6 +273,63 @@
     prop_names = '  A    B   L   kappa_op kappa_c'
     prop_values = '16.0 1.0 1.0  0.5      1.0    '
   [../]
+  [./elasticity_tensor]
+    type = ComputeElasticityTensor
+    block = 0
+    # lambda, mu values
+    C_ijkl = '7 7'
+    # Stiffness tensor is created from lambda=7, mu=7 using symmetric_isotropic fill method
+    fill_method = symmetric_isotropic
+    # See RankFourTensor.h for details on fill methods
+    # '15 15' results in a high stiffness (the elastic free energy will dominate)
+    # '7 7' results in a low stiffness (the chemical free energy will dominate)
+  [../]
+  [./stress]
+    type = ComputeLinearElasticStress
+    block = 0
+  [../]
+    [./var_dependence]
+    type = DerivativeParsedMaterial
+    block = 0
+    function = 0.2*c
+    args = c
+    f_name = var_dep
+    enable_jit = true
+    derivative_order = 2
+  [../]
+
+  [./eigenstrain]
+    type = ComputeVariableEigenstrain
+    block = 0
+    eigen_base = '1 1 1 0 0 0'
+    prefactor = var_dep
+    #outputs = exodus
+    args = 'c'
+    eigenstrain_name = eigenstrain
+  [../]
+  [./strain]
+    type = ComputeSmallStrain
+    # block = 0
+    displacements = 'disp_x disp_y'
+    eigenstrain_names = eigenstrain
+  [../]
+  [./elastic_free_energy]
+    type = ElasticEnergyMaterial
+    f_name = Fe
+    block = 0
+    args = 'c'
+    derivative_order = 2
+  [../]
+
+  # Sum up chemical and elastic contributions
+  [./free_energy]
+    type = DerivativeSumMaterial
+    block = 0
+    f_name = F
+    sum_materials = 'Fc Fe'
+    args = 'c'
+    derivative_order = 2
+  [../]
 []
 
 [VectorPostprocessors]
@@ -213,6 +338,7 @@
     flood_counter = grain_center
     execute_on = 'initial timestep_begin'
   [../]
+  # undersized solute (voidlike)
 []
 
 [UserObjects]
@@ -240,6 +366,14 @@
   [./free_en]
     type = ElementIntegralMaterialProperty
     mat_prop = F
+  [../]
+  [./el_free_en]
+    type = ElementIntegralMaterialProperty
+    mat_prop = Fe
+  [../]
+  [./ch_free_en]
+    type = ElementIntegralMaterialProperty
+    mat_prop = Fc
   [../]
   [./dofs]
     type = NumDOFs
@@ -284,20 +418,21 @@
   # Preconditioned JFNK (default)
   type = Transient
   scheme = BDF2
-  solve_type = NEWTON
-  petsc_options_iname = '-pc_type -ksp_grmres_restart -sub_ksp_type -sub_pc_type -pc_asm_overlap'
+  # solve_type = NEWTON
+   solve_type = 'PJFNK'
+ petsc_options_iname = '-pc_type -ksp_grmres_restart -sub_ksp_type -sub_pc_type -pc_asm_overlap'
   petsc_options_value = 'asm         31   preonly   lu      1'
   l_max_its = 20
   nl_max_its = 20
-  nl_abs_tol = 1e-10
-  nl_rel_tol = 1e-08
+  nl_abs_tol = 1e-08
+  nl_rel_tol = 1e-06
   l_tol = 1e-04
   end_time = 20
   #dt = 0.01
   [./TimeStepper]
     type = IterationAdaptiveDT
-    dt = 0.01
-    growth_factor = 1.2
+    dt = 0.005
+    growth_factor = 1.0
   [../]
 []
 

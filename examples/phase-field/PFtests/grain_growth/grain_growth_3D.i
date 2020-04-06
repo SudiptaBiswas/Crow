@@ -17,6 +17,7 @@
   zmin = 0
   zmax = 1000
   uniform_refine = 1 # Initial uniform refinement of the mesh
+
   parallel_type = distributed
 []
 
