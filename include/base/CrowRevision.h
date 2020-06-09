@@ -2,5 +2,5 @@
 
 #pragma once
 
-#define CROW_REVISION "git commit 2af080a on 2020-03-15"
-#define CROW_VERSION "2af080a"
+#define CROW_REVISION "git commit 4e94bd2 on 2020-04-04"
+#define CROW_VERSION "4e94bd2"
