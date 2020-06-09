@@ -4,10 +4,10 @@
   nx = 60
   ny = 60
   #   nz = 0
-  xmin = 6.0
-  xmax = 33.0
-  ymin = 13.0
-  ymax = 34.0
+  xmin = 60.0
+  xmax = 330.0
+  ymin = 130.0
+  ymax = 340.0
   # zmax = 0
   elem_type = QUAD4
 []
@@ -38,118 +38,103 @@
   [../]
 []
 
-  #  28.9158   18.2981    3.8750
-  #  10.6328   29.4843    3.7500
-  #  21.7174   15.3236    3.7500
 [ICs]
   [./ic_gr8]
-    int_width = 2.0
-    x1 = 28.9158
-    y1 = 18.2981
-    radius = 3.895
+    int_width = 20.0
+    x1 = 280.9158
+    y1 = 180.2981
+    radius = 36.895
     outvalue = 0.0
     variable = gr8
     invalue = 1.0
     type = SmoothCircleIC
   [../]
   [./ic_gr7]
-    int_width = 2.0
-    x1 = 10.6328
-    y1 = 29.4843
-    radius = 3.75
+    int_width = 20.0
+    x1 = 100.6328
+    y1 = 290.4843
+    radius = 36.75
     outvalue = 0.0
     variable = gr7
     invalue = 1.0
     type = SmoothCircleIC
   [../]
   [./ic_gr6]
-    int_width = 2.0
+    int_width = 20.0
     x1 = 21.7174
     y1 = 15.3236
-    radius = 3.75
+    radius = 36.75
     outvalue = 0.0
     variable = gr6
     invalue = 1.0
     type = SmoothCircleIC
   [../]
-  # 28.9158	10.6328	21.7174	20.0109	27.8199	22.9458	13.5818	8.592	15.6702
-  # 18.2981	29.4843	15.3236	30.5594	28.1836	22.7441	17.6532	22.4133	24.1294
-  # 3.875	3.75	3.75	4.325	3.5	3.375	3.375	3.25	3.25
-  #  20.0109   30.5594    4.3250
-  #  27.8199   28.1836    3.5000
-  #  22.9458   22.7441    3.3750
   [./ic_gr5]
-    int_width = 2.0
-    x1 = 20.0109
-    y1 = 30.5594
-    radius = 4.32
+    int_width = 20.0
+    x1 = 200.0109
+    y1 = 300.5594
+    radius = 40.32
     outvalue = 0.0
     variable = gr5
     invalue = 1.0
     type = SmoothCircleIC
   [../]
   [./ic_gr4]
-    int_width = 2.0
-    x1 = 27.8199
-    y1 = 28.1836
-    radius = 3.375
+    int_width = 20.0
+    x1 = 270.8199
+    y1 = 280.1836
+    radius = 36.375
     outvalue = 0.0
     variable = gr4
     invalue = 1.0
     type = SmoothCircleIC
   [../]
   [./ic_gr3]
-    int_width = 2.0
-    x1 = 22.0109
-    y1 = 22.7441
-    radius = 3.375
+    int_width = 20.0
+    x1 = 220.0109
+    y1 = 220.7441
+    radius = 36.375
     outvalue = 0.0
     variable = gr3
     invalue = 1.0
     type = SmoothCircleIC
   [../]
-  #  13.5818   17.6532    3.3750
-  #  15.6702   24.1294    3.2500
-  #  15.6702   24.1294    3.2500
-[./ic_g2]
-    int_width = 2.0
-    x1 = 13.5818
-    y1 = 17.6532
-    radius = 3.375
+ [./ic_g2]
+    int_width = 20.0
+    x1 = 130.5818
+    y1 = 170.6532
+    radius = 36.375
     outvalue = 0.0
     variable = gr2
     invalue = 1.0
     type = SmoothCircleIC
   [../]
   [./ic_gr1]
-    int_width = 2.0
-    x1 = 8.592
-    y1 = 22.4133
-    radius = 3.25
+    int_width = 20.0
+    x1 = 80.592
+    y1 = 220.4133
+    radius = 36.25
     outvalue = 0.0
     variable = gr1
     invalue = 1.0
     type = SmoothCircleIC
   [../]
   [./ic_gr0]
-    int_width = 2.0
-    x1 = 15.6702
-    y1 = 24.1294
-    radius = 3.25
+    int_width = 20.0
+    x1 = 150.6702
+    y1 = 240.1294
+    radius = 36.25
     outvalue = 0.0
     variable = gr0
     invalue = 1.0
     type = SmoothCircleIC
   [../]
-  # 28.9158	10.6328	21.7174	20.0109	27.8199	22.9458	13.5818	8.592	15.6702
-  # 18.2981	29.4843	15.3236	30.5594	28.1836	22.7441	17.6532	22.4133	24.1294
-  # 3.875	3.75	3.75	4.325	3.5	3.375	3.375	3.25	3.25
   [./multip]
-    x_positions = '28.9158 10.6328	21.7174	20.0109	27.8199	22.9458	13.5818	8.592	15.6702'
-    y_positions = '18.2981 29.4843	15.3236	30.5594	28.1836	22.7441	17.6532	22.4133	24.1294'
+    x_positions = '280.9158 100.6328	210.7174	200.0109	270.8199	220.9458	130.5818	8.592	   150.6702'
+    y_positions = '180.2981 290.4843	150.3236	300.5594	280.1836	220.7441	170.6532	220.4133	240.1294'
     z_positions = '0 0 0 0 0 0 0 0 0'
-    radii = '3.875	3.75	3.75	4.325	3.5	3.375	3.375	3.25	3.25'
-    int_width = 2.0
+    radii = '36.875	36.75	36.75	40.325	36.5	36.375	36.375	36.25	36.25'
+    int_width = 20.0
     3D_spheres = false
     outvalue = 0.001
     variable = c
@@ -192,6 +177,12 @@
   [./TensorMechanics]
     displacements = 'disp_x disp_y'
   [../]
+  [./gravity_y]
+    type = Gravity
+    variable = disp_y
+    # value = -0.2 # 1.81
+    value = -9.0 # 1.81
+  [../]
   [./cres]
     type = SplitCHParsed
     variable = c
@@ -223,7 +214,6 @@
 []
 
 [AuxKernels]
-
   [./bnds]
     type = BndsCalcAux
     variable = bnds
@@ -273,42 +263,42 @@
 []
 
 [BCs]
-# Boundary Condition block
+ # Boundary Condition block
   [./Periodic]
     [./top_bottom]
-      auto_direction = 'x y' # Makes problem periodic in the x and y directions
+      auto_direction = 'x' # Makes problem periodic in the x and y directions
     [../]
   [../]
-
   # [./flux]
   #   type = CahnHilliardFluxBC
   #   variable = w
   #   boundary = 'top bottom left right'
-  #   flux = '0 0 0'
+  #   flux = '1 -1 0 0'
   #   mob_name = D
   #   args = 'c'
   # [../]
-#   [./bottom_y]
-#     type = DirichletBC
-#     variable = disp_y
-#     boundary = 'bottom'
-#     value = 0
-#   [../]
-#   [./top_y]
-#     type = DirichletBC
-#     variable = disp_y
-#     boundary = 'top'
-#     # prescribed displacement
-#     # -5 will result in a compressive stress
-#     #  5 will result in a tensile stress
-#     value = -5
-#   [../]
-#   [./left_x]
-#     type = DirichletBC
-#     variable = disp_x
-#     boundary = 'left'
-#     value = 0
-#   [../]
+   [./bottom_y]
+     type = DirichletBC
+     variable = disp_y
+     boundary = 'bottom'
+     value = 0
+   [../]
+   [./top_y]
+     type = DirichletBC
+     variable = disp_y
+     boundary = 'top'
+     # prescribed displacement 
+     # -5 will result in a compressive stress
+     #  5 will result in a tensile stress
+    #  value = -3
+     value = -1
+   [../]
+ #   [./left_x]
+ #     type = DirichletBC
+ #     variable = disp_x
+ #     boundary = 'left'
+ #     value = 0
+ #   [../]
 
   # [./right_x]
   #   type = DirichletBC
@@ -346,20 +336,26 @@
     type = GenericConstantMaterial
     block = 0
     prop_names = '  A    B   L   kappa_op kappa_c'
-    prop_values = '16.0 1.0 1.0  0.5      1.0    '
+    prop_values = '16.0 1.0 1.0  5.0      10.0    '
+   # 16.0 1.0 1.0 0.5 1.0
   [../]
- #   [./var_dependence]
- #     type = DerivativeParsedMaterial
- #     block = 0
- #     # eigenstrain coefficient
- #     # -0.1 will result in an undersized precipitate
- #     #  0.1 will result in an oversized precipitate
- #     function = 0.1*c
- #     args = c
- #     f_name = var_dep
- #     enable_jit = true
- #     derivative_order = 2
- #   [../]
+  [./density]
+    type = GenericConstantMaterial
+    prop_names = density
+    prop_values = 0.000000001
+  [../]
+  #   [./var_dependence]
+  #     type = DerivativeParsedMaterial
+  #     block = 0
+  #     # eigenstrain coefficient
+  #     # -0.1 will result in an undersized precipitate
+  #     #  0.1 will result in an oversized precipitate
+  #     function = 0.1*c
+  #     args = c
+  #     f_name = var_dep
+  #     enable_jit = true
+  #     derivative_order = 2
+  #   [../]
   [./elasticity_tensor]
     type = ComputeElasticityTensor
     block = 0
@@ -384,7 +380,6 @@
     enable_jit = true
     derivative_order = 2
   [../]
-
   [./eigenstrain]
     type = ComputeVariableEigenstrain
     block = 0
@@ -407,7 +402,6 @@
     args = 'c'
     derivative_order = 2
   [../]
-
   # Sum up chemical and elastic contributions
   [./free_energy]
     type = DerivativeSumMaterial
@@ -518,8 +512,8 @@
   #dt = 0.01
   [./TimeStepper]
     type = IterationAdaptiveDT
-    dt = 0.005
-    growth_factor = 1.1
+    dt = 0.001
+    growth_factor = 1.5
   [../]
 []
 

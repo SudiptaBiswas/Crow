@@ -3,12 +3,10 @@
   dim = 2
   nx = 60
   ny = 60
-  #   nz = 0
   xmin = 6.0
   xmax = 33.0
   ymin = 13.0
   ymax = 34.0
-  # zmax = 0
   elem_type = QUAD4
 []
 
@@ -18,6 +16,7 @@
   op_num = 9.0
   int_width = 1.0
   #en_ratio = 1
+  temperature = temp
 []
 
 [Variables]
@@ -36,20 +35,20 @@
     order = FIRST
     family = LAGRANGE
   [../]
+  [./temp]
+    initial_condition = 400
+  [../]
 []
 
-  #  28.9158   18.2981    3.8750
-  #  10.6328   29.4843    3.7500
-  #  21.7174   15.3236    3.7500
 [ICs]
   [./ic_gr8]
     int_width = 2.0
     x1 = 28.9158
     y1 = 18.2981
     radius = 3.895
-    outvalue = 0.0
+    outvalue = 0.01
     variable = gr8
-    invalue = 1.0
+    invalue = 0.99
     type = SmoothCircleIC
   [../]
   [./ic_gr7]
@@ -57,9 +56,9 @@
     x1 = 10.6328
     y1 = 29.4843
     radius = 3.75
-    outvalue = 0.0
+    outvalue = 0.01
     variable = gr7
-    invalue = 1.0
+    invalue = 0.99
     type = SmoothCircleIC
   [../]
   [./ic_gr6]
@@ -72,20 +71,14 @@
     invalue = 1.0
     type = SmoothCircleIC
   [../]
-  # 28.9158	10.6328	21.7174	20.0109	27.8199	22.9458	13.5818	8.592	15.6702
-  # 18.2981	29.4843	15.3236	30.5594	28.1836	22.7441	17.6532	22.4133	24.1294
-  # 3.875	3.75	3.75	4.325	3.5	3.375	3.375	3.25	3.25
-  #  20.0109   30.5594    4.3250
-  #  27.8199   28.1836    3.5000
-  #  22.9458   22.7441    3.3750
   [./ic_gr5]
     int_width = 2.0
     x1 = 20.0109
     y1 = 30.5594
     radius = 4.32
-    outvalue = 0.0
+    outvalue = 0.01
     variable = gr5
-    invalue = 1.0
+    invalue = 0.99
     type = SmoothCircleIC
   [../]
   [./ic_gr4]
@@ -93,9 +86,9 @@
     x1 = 27.8199
     y1 = 28.1836
     radius = 3.375
-    outvalue = 0.0
+    outvalue = 0.01
     variable = gr4
-    invalue = 1.0
+    invalue = 0.99
     type = SmoothCircleIC
   [../]
   [./ic_gr3]
@@ -108,17 +101,14 @@
     invalue = 1.0
     type = SmoothCircleIC
   [../]
-  #  13.5818   17.6532    3.3750
-  #  15.6702   24.1294    3.2500
-  #  15.6702   24.1294    3.2500
 [./ic_g2]
     int_width = 2.0
     x1 = 13.5818
     y1 = 17.6532
     radius = 3.375
-    outvalue = 0.0
+    outvalue = 0.01
     variable = gr2
-    invalue = 1.0
+    invalue = 0.99
     type = SmoothCircleIC
   [../]
   [./ic_gr1]
@@ -126,9 +116,9 @@
     x1 = 8.592
     y1 = 22.4133
     radius = 3.25
-    outvalue = 0.0
+    outvalue = 0.01
     variable = gr1
-    invalue = 1.0
+    invalue = 0.99
     type = SmoothCircleIC
   [../]
   [./ic_gr0]
@@ -136,14 +126,11 @@
     x1 = 15.6702
     y1 = 24.1294
     radius = 3.25
-    outvalue = 0.0
+    outvalue = 0.01
     variable = gr0
-    invalue = 1.0
+    invalue = .99
     type = SmoothCircleIC
   [../]
-  # 28.9158	10.6328	21.7174	20.0109	27.8199	22.9458	13.5818	8.592	15.6702
-  # 18.2981	29.4843	15.3236	30.5594	28.1836	22.7441	17.6532	22.4133	24.1294
-  # 3.875	3.75	3.75	4.325	3.5	3.375	3.375	3.25	3.25
   [./multip]
     x_positions = '28.9158 10.6328	21.7174	20.0109	27.8199	22.9458	13.5818	8.592	15.6702'
     y_positions = '18.2981 29.4843	15.3236	30.5594	28.1836	22.7441	17.6532	22.4133	24.1294'
@@ -151,9 +138,9 @@
     radii = '3.875	3.75	3.75	4.325	3.5	3.375	3.375	3.25	3.25'
     int_width = 2.0
     3D_spheres = false
-    outvalue = 0.001
+    outvalue = 0.01
     variable = c
-    invalue = 0.999
+    invalue = 0.99
     type = SpecifiedSmoothCircleIC
     block = 0
   [../]
@@ -188,7 +175,33 @@
   [../]
 []
 
+[Functions]
+  [./load]
+    type = ConstantFunction
+    value = 0.01
+  [../]
+  # [./tempFunc]
+  #   type = PiecewiseLinear
+  #   x = '10       20'
+  #   y = '400   700'
+  # [../]
+[]
+
 [Kernels]
+  [./heat]
+    type = HeatConduction
+    variable = temp
+  [../]
+  [./HeatSource]
+    type = HeatSource
+    # function = '1*sin(3.14159*x/20)*sin(3.14159*y/80)*sin(3.14159*z/20)'
+    function = '10*exp(-((x-(33-1.35*t))^2/5))*exp(-abs(y-34)/1)'
+    variable = temp
+  [../]
+  # [./HeatTdot]
+  #   type = HeatConductionTimeDerivative
+  #   variable = temp
+  # [../]
   [./TensorMechanics]
     displacements = 'disp_x disp_y'
   [../]
@@ -223,7 +236,6 @@
 []
 
 [AuxKernels]
-
   [./bnds]
     type = BndsCalcAux
     variable = bnds
@@ -274,55 +286,34 @@
 
 [BCs]
 # Boundary Condition block
+  # [./Periodic]
+  #   [./top_bottom]
+  #     auto_direction = 'x ' # Makes problem periodic in the x and y directions
+  #   [../]
+  # [../]
   [./Periodic]
-    [./top_bottom]
-      auto_direction = 'x y' # Makes problem periodic in the x and y directions
+    [./left_right]
+      auto_direction = 'x ' # Makes problem periodic in the x and y directions
     [../]
   [../]
-
-  # [./flux]
-  #   type = CahnHilliardFluxBC
-  #   variable = w
-  #   boundary = 'top bottom left right'
-  #   flux = '0 0 0'
-  #   mob_name = D
-  #   args = 'c'
-  # [../]
-#   [./bottom_y]
-#     type = DirichletBC
-#     variable = disp_y
-#     boundary = 'bottom'
-#     value = 0
-#   [../]
-#   [./top_y]
-#     type = DirichletBC
-#     variable = disp_y
-#     boundary = 'top'
-#     # prescribed displacement
-#     # -5 will result in a compressive stress
-#     #  5 will result in a tensile stress
-#     value = -5
-#   [../]
-#   [./left_x]
-#     type = DirichletBC
-#     variable = disp_x
-#     boundary = 'left'
-#     value = 0
-#   [../]
-
-  # [./right_x]
+  # [./left]
   #   type = DirichletBC
-  #   variable = disp_x
-  #   boundary = 'right'
-  #   value = 8
+  #   variable = temp
+  #   boundary = top
+  #   value = 300
   # [../]
-[]
-
-[Functions]
-  [./load]
-    type = ConstantFunction
-    value = 0.01
+  [./bottom]
+    type = DirichletBC
+    variable = temp
+    boundary = bottom
+    value = 700
   [../]
+  # [./temp]
+  #   type = FunctionDirichletBC
+  #   variable = temp
+  #   boundary = 'top bottom'
+  #   function = tempFunc
+  # [../]
 []
 
 [Materials]
@@ -384,16 +375,15 @@
     enable_jit = true
     derivative_order = 2
   [../]
-
-  [./eigenstrain]
-    type = ComputeVariableEigenstrain
-    block = 0
-    eigen_base = '1 1 1 0 0 0'
-    prefactor = var_dep
-    #outputs = exodus
-    args = 'c'
-    eigenstrain_name = eigenstrain
-  [../]
+  # [./eigenstrain]
+  #   type = ComputeVariableEigenstrain
+  #   block = 0
+  #   eigen_base = '1 1 1 0 0 0'
+  #   prefactor = var_dep
+  #   #outputs = exodus
+  #   args = 'c'
+  #   eigenstrain_name = eigenstrain
+  # [../]
   [./strain]
     type = ComputeSmallStrain
     # block = 0
@@ -407,7 +397,6 @@
     args = 'c'
     derivative_order = 2
   [../]
-
   # Sum up chemical and elastic contributions
   [./free_energy]
     type = DerivativeSumMaterial
@@ -417,6 +406,38 @@
     args = 'c'
     derivative_order = 2
   [../]
+  [./thermal_strain]
+    type = ComputeThermalExpansionEigenstrain
+    block = 0
+    # eigen_base = '1 1 1 0 0 0'
+    # prefactor = var_dep
+    temperature = temp
+    # outputs = exodus
+    # args = 'c'
+    stress_free_temperature = 400
+    thermal_expansion_coeff = 1e-8
+    eigenstrain_name = eigenstrain
+  [../]
+  [./heat]
+    type = HeatConductionMaterial
+    block = 0
+    specific_heat = 1.0
+    thermal_conductivity = 1.0
+  [../]
+  [./poissons_ratio]
+    type = PiecewiseLinearInterpolationMaterial
+    x = '100 500'
+    y = '0   0.25'
+    property = poissons_ratio
+    variable = temp
+  [../]
+  # [./density]
+  #   type = Density
+  #   density = 1.0
+  #   disp_x = disp_x
+  #   disp_y = disp_y
+  #   # disp_z = disp_z
+  # [../]
 []
 
 [VectorPostprocessors]
@@ -438,6 +459,11 @@
 []
 
 [Postprocessors]
+  # [./temp]
+  #   type = AverageNodalVariableValue
+  #   variable = temp
+  #   output = exodus
+  # [../]
   [./elem_c]
     type = ElementIntegralVariablePostprocessor
     variable = c
@@ -469,10 +495,6 @@
   [./tstep]
     type = TimestepSize
   [../]
-  # [./run_time]
-  #   type = RunTime
-  #   time_type = active
-  # [../]
   [./int_area]
     type = InterfaceAreaPostprocessor
     variable = c
@@ -511,14 +533,14 @@
   petsc_options_value = 'asm         31   preonly   lu      1'
   l_max_its = 20
   nl_max_its = 20
-  nl_abs_tol = 1e-08
+  nl_abs_tol = 1e-06
   nl_rel_tol = 1e-06
   l_tol = 1e-04
   end_time = 20
   #dt = 0.01
   [./TimeStepper]
     type = IterationAdaptiveDT
-    dt = 0.005
+    dt = 0.01
     growth_factor = 1.1
   [../]
 []
@@ -545,6 +567,7 @@
 [Outputs]
   print_linear_residuals = true
   csv = true
+  # exodus = true
   gnuplot = true
   print_perf_log = true
   [./console]

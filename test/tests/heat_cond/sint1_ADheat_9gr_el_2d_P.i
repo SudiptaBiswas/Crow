@@ -3,12 +3,10 @@
   dim = 2
   nx = 60
   ny = 60
-  #   nz = 0
   xmin = 6.0
   xmax = 33.0
   ymin = 13.0
   ymax = 34.0
-  # zmax = 0
   elem_type = QUAD4
 []
 
@@ -17,7 +15,6 @@
   var_name_base = gr
   op_num = 9.0
   int_width = 1.0
-  #en_ratio = 1
 []
 
 [Variables]
@@ -36,11 +33,11 @@
     order = FIRST
     family = LAGRANGE
   [../]
+  [./temp]
+    initial_condition = 400
+  [../]
 []
 
-  #  28.9158   18.2981    3.8750
-  #  10.6328   29.4843    3.7500
-  #  21.7174   15.3236    3.7500
 [ICs]
   [./ic_gr8]
     int_width = 2.0
@@ -72,12 +69,6 @@
     invalue = 1.0
     type = SmoothCircleIC
   [../]
-  # 28.9158	10.6328	21.7174	20.0109	27.8199	22.9458	13.5818	8.592	15.6702
-  # 18.2981	29.4843	15.3236	30.5594	28.1836	22.7441	17.6532	22.4133	24.1294
-  # 3.875	3.75	3.75	4.325	3.5	3.375	3.375	3.25	3.25
-  #  20.0109   30.5594    4.3250
-  #  27.8199   28.1836    3.5000
-  #  22.9458   22.7441    3.3750
   [./ic_gr5]
     int_width = 2.0
     x1 = 20.0109
@@ -108,9 +99,7 @@
     invalue = 1.0
     type = SmoothCircleIC
   [../]
-  #  13.5818   17.6532    3.3750
-  #  15.6702   24.1294    3.2500
-  #  15.6702   24.1294    3.2500
+
 [./ic_g2]
     int_width = 2.0
     x1 = 13.5818
@@ -141,9 +130,7 @@
     invalue = 1.0
     type = SmoothCircleIC
   [../]
-  # 28.9158	10.6328	21.7174	20.0109	27.8199	22.9458	13.5818	8.592	15.6702
-  # 18.2981	29.4843	15.3236	30.5594	28.1836	22.7441	17.6532	22.4133	24.1294
-  # 3.875	3.75	3.75	4.325	3.5	3.375	3.375	3.25	3.25
+
   [./multip]
     x_positions = '28.9158 10.6328	21.7174	20.0109	27.8199	22.9458	13.5818	8.592	15.6702'
     y_positions = '18.2981 29.4843	15.3236	30.5594	28.1836	22.7441	17.6532	22.4133	24.1294'
@@ -188,7 +175,23 @@
   [../]
 []
 
+[Functions]
+  [./load]
+    type = ConstantFunction
+    value = 0.01
+  [../]
+  [./temperature_function]
+    type = PiecewiseLinear
+    x = '1       4'
+    y = '400   700'
+  [../]
+[]
+
 [Kernels]
+  [./heat]
+    type = ADDiffusion
+    variable = temp
+  [../]
   [./TensorMechanics]
     displacements = 'disp_x disp_y'
   [../]
@@ -280,52 +283,26 @@
     [../]
   [../]
 
-  # [./flux]
-  #   type = CahnHilliardFluxBC
-  #   variable = w
-  #   boundary = 'top bottom left right'
-  #   flux = '0 0 0'
-  #   mob_name = D
-  #   args = 'c'
-  # [../]
-#   [./bottom_y]
-#     type = DirichletBC
-#     variable = disp_y
-#     boundary = 'bottom'
-#     value = 0
-#   [../]
-#   [./top_y]
-#     type = DirichletBC
-#     variable = disp_y
-#     boundary = 'top'
-#     # prescribed displacement
-#     # -5 will result in a compressive stress
-#     #  5 will result in a tensile stress
-#     value = -5
-#   [../]
-#   [./left_x]
-#     type = DirichletBC
-#     variable = disp_x
-#     boundary = 'left'
-#     value = 0
-#   [../]
-
-  # [./right_x]
-  #   type = DirichletBC
-  #   variable = disp_x
-  #   boundary = 'right'
-  #   value = 8
-  # [../]
-[]
-
-[Functions]
-  [./load]
-    type = ConstantFunction
-    value = 0.01
+  [./temp_bc_1]
+    type = ADFunctionDirichletBC
+    variable = temp
+    preset = false
+    boundary = 'top bottom'
+    function = temperature_function
   [../]
 []
 
 [Materials]
+  [./youngs_modulus]
+    type = ADPiecewiseLinearInterpolationMaterial
+    xy_data = '0          10e+6
+               599.9999   10e+6
+               600        9.94e+6
+               99900      10e3'
+    property = youngs_modulus
+    variable = temp
+  [../]
+
   [./chemical_free_energy]
     type = SinteringFreeEnergy
     block = 0
@@ -348,18 +325,7 @@
     prop_names = '  A    B   L   kappa_op kappa_c'
     prop_values = '16.0 1.0 1.0  0.5      1.0    '
   [../]
- #   [./var_dependence]
- #     type = DerivativeParsedMaterial
- #     block = 0
- #     # eigenstrain coefficient
- #     # -0.1 will result in an undersized precipitate
- #     #  0.1 will result in an oversized precipitate
- #     function = 0.1*c
- #     args = c
- #     f_name = var_dep
- #     enable_jit = true
- #     derivative_order = 2
- #   [../]
+
   [./elasticity_tensor]
     type = ComputeElasticityTensor
     block = 0
@@ -469,10 +435,7 @@
   [./tstep]
     type = TimestepSize
   [../]
-  # [./run_time]
-  #   type = RunTime
-  #   time_type = active
-  # [../]
+
   [./int_area]
     type = InterfaceAreaPostprocessor
     variable = c
@@ -491,6 +454,10 @@
   [../]
   [./gb_area]
     type = GrainBoundaryArea
+  [../]
+  [./temp]
+    type = AverageNodalVariableValue
+    variable = temp
   [../]
 []
 
