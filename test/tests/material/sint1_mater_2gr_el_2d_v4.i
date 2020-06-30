@@ -243,51 +243,39 @@
     derivative_order = 2
     outputs = exodus
   [../]
-#   [./Dv_temp]
-#     type = DerivativeParsedMaterial
-#     f_name = Dv_temp
-#     args = 'temp'
-#     constant_names = 'Dvol'
-#     constant_expressions = '0.01'
-#     function = 'Dvol+0.0001*temp'
-#     derivative_order = 2
-#     outputs = exodus
-#   [../]
-#    [./youngs_modulus]
-#     type = PiecewiseLinearInterpolationMaterial
-#     x = '100 500'
-#     y = '1e6 6e5'
-#     property = youngs_modulus
-#     variable = temp
-#   [../]
-  [./Dv_temp]
-    type = ADPiecewiseLinearInterpolationMaterial
-    property = Dv_temp
-    variable = temp
-    x = '400 500 600 700'
-    y = '0.01  0.02 0.03 0.04'
-  [../]
- [./mobility]
+  [./Dvtemp]
     type = DerivativeParsedMaterial
-    f_name = D
-    args = 'c gr0 gr1'
-    constant_names = 'Dvap Dsurf Dgb'
-    constant_expressions = '0.001 4 0.4'
-    # Dvol = Dv_temp
-    material_property_names = 'Dv_temp phi'
-    function = 'Dv_temp*phi+Dvap*(1.0-phi)+Dsurf*c*(1-c)+Dgb*gr0*gr1'
+    f_name = Dvtemp
+    args = 'temp'
+    constant_names = 'Dvol'
+    constant_expressions = '0.01'
+    function = 'Dvol+0.0001*temp'
+    # material_property_names = 'Dvtemp'
     derivative_order = 2
     outputs = exodus
   [../]
-#   [./CH_mat]
-#     type = PFDiffusionGrowthM3
-#     block = 0
-#     Dvol = 0.01
-#     rho = c
-#     T = temp
-#     v = 'gr0 gr1'
-#     outputs = console
+#  [./mobility]
+#     type = DerivativeParsedMaterial
+#     f_name = D
+#     args = 'c gr0 gr1'
+#     constant_names = 'Dvap Dsurf Dgb'
+#     constant_expressions = '0.001 4 0.4'
+#     # Dvol = Dv_temp
+#     material_property_names = 'Dv_temp phi'
+#     function = 'Dv_temp*phi+Dvap*(1.0-phi)+Dsurf*c*(1-c)+Dgb*gr0*gr1'
+#     derivative_order = 2
+#     outputs = exodus
 #   [../]
+  [./CH_mat]
+    type = PFDiffusionGrowthM4
+    block = 0
+    # Dvol = 0.01
+    # Dvtemp = Dvtemp
+    rho = c
+    T = temp
+    v = 'gr0 gr1'
+    outputs = console
+  [../]
   [./constant_mat]
     type = GenericConstantMaterial
     block = 0

@@ -15,6 +15,8 @@
   var_name_base = gr
   op_num = 2.0
   int_width = 1.0
+  #en_ratio = 1
+#   temperature = temp
 []
 
 [Variables]
@@ -36,9 +38,82 @@
   [./temp]
     initial_condition = 400
   [../]
+  # [./Dvol]
+  #   initial_condition = 0.01
+  # [../]
 []
 
 [ICs]
+#   [./ic_gr8]
+#     int_width = 2.0
+#     x1 = 28.9158
+#     y1 = 18.2981
+#     radius = 3.895
+#     outvalue = 0.01
+#     variable = gr8
+#     invalue = 0.99
+#     type = SmoothCircleIC
+#   [../]
+#   [./ic_gr7]
+#     int_width = 2.0
+#     x1 = 10.6328
+#     y1 = 29.4843
+#     radius = 3.75
+#     outvalue = 0.01
+#     variable = gr7
+#     invalue = 0.99
+#     type = SmoothCircleIC
+#   [../]
+#   [./ic_gr6]
+#     int_width = 2.0
+#     x1 = 21.7174
+#     y1 = 15.3236
+#     radius = 3.75
+#     outvalue = 0.0
+#     variable = gr6
+#     invalue = 1.0
+#     type = SmoothCircleIC
+#   [../]
+#   [./ic_gr5]
+#     int_width = 2.0
+#     x1 = 20.0109
+#     y1 = 30.5594
+#     radius = 4.32
+#     outvalue = 0.01
+#     variable = gr5
+#     invalue = 0.99
+#     type = SmoothCircleIC
+#   [../]
+#   [./ic_gr4]
+#     int_width = 2.0
+#     x1 = 27.8199
+#     y1 = 28.1836
+#     radius = 3.375
+#     outvalue = 0.01
+#     variable = gr4
+#     invalue = 0.99
+#     type = SmoothCircleIC
+#   [../]
+#   [./ic_gr3]
+#     int_width = 2.0
+#     x1 = 22.0109
+#     y1 = 22.7441
+#     radius = 3.375
+#     outvalue = 0.0
+#     variable = gr3
+#     invalue = 1.0
+#     type = SmoothCircleIC
+#   [../]
+# [./ic_g2]
+#     int_width = 2.0
+#     x1 = 13.5818
+#     y1 = 17.6532
+#     radius = 3.375
+#     outvalue = 0.01
+#     variable = gr2
+#     invalue = 0.99
+#     type = SmoothCircleIC
+#   [../]
   [./ic_gr1]
     int_width = 2.0
     x1 = 12.592
@@ -60,6 +135,10 @@
     type = SmoothCircleIC
   [../]
   [./multip]
+    # x_positions = '28.9158 10.6328	21.7174	20.0109	27.8199	22.9458	13.5818	8.592	15.6702'
+    # y_positions = '18.2981 29.4843	15.3236	30.5594	28.1836	22.7441	17.6532	22.4133	24.1294'
+    # z_positions = '0 0 0 0 0 0 0 0 0'
+    # radii = '3.875	3.75	3.75	4.325	3.5	3.375	3.375	3.25	3.25'
     x_positions = '12.592	24.6702'
     y_positions = '22.4133	24.1294'
     z_positions = '0 0'
@@ -104,22 +183,41 @@
 []
 
 [Functions]
+#   [./Dv]
+#     type = ConstantFunction
+#     value = 0.001
+#   [../]
   [./load]
     type = ConstantFunction
     value = 0.01
   [../]
+  # [./tempFunc]
+  #   type = PiecewiseLinear
+  #   x = '10       20'
+  #   y = '400   700'
+  # [../]
 []
 
 [Kernels]
+  # [./Diffusion]
+  #   type = MatDiffusion
+  #   variable = Dvol
+  #   diffusivity = diffusivity
+  # [../]
   [./heat]
     type = HeatConduction
     variable = temp
   [../]
   [./HeatSource]
     type = HeatSource
+    # function = '1*sin(3.14159*x/20)*sin(3.14159*y/80)*sin(3.14159*z/20)'
     function = '10*exp(-((x-(31-2.7*t))^2/2))*exp(-abs(y-34)/1)'
     variable = temp
   [../]
+  # [./HeatTdot]
+  #   type = HeatConductionTimeDerivative
+  #   variable = temp
+  # [../]
   [./TensorMechanics]
     displacements = 'disp_x disp_y'
   [../]
@@ -204,96 +302,105 @@
 
 [BCs]
 # Boundary Condition block
+  # [./Periodic]
+  #   [./top_bottom]
+  #     auto_direction = 'x ' # Makes problem periodic in the x and y directions
+  #   [../]
+  # [../]
   [./Periodic]
     [./left_right]
       auto_direction = 'x ' # Makes problem periodic in the x and y directions
     [../]
   [../]
+  # [./left]
+  #   type = DirichletBC
+  #   variable = temp
+  #   boundary = top
+  #   value = 300
+  # [../]
   [./bottom]
     type = DirichletBC
     variable = temp
     boundary = bottom
-    value = 400
+    value = 700
   [../]
+  # [./temp]
+  #   type = FunctionDirichletBC
+  #   variable = temp
+  #   boundary = 'top bottom'
+  #   function = tempFunc
+  # [../]
 []
 
 [Materials]
-  [./sumofgr]
-    type = DerivativeParsedMaterial
-    f_name = sumofgr
-    args = 'gr0 gr1'
-    function = (gr0^2+gr1^2)
-    derivative_order = 2
-  [../]
+#   [./chemical_free_energy]
+#     type = SinteringFreeEnergy
+#     block = 0
+#     c = c
+#     v = 'gr0 gr1 '
+#     f_name = Fc
+#     derivative_order = 2
+#     #outputs = console
+#   [../]
+#   [./free_energy]
+#     type = DerivativeParsedMaterial
+#     f_name = F
+#     args = 'c eta0 eta1'
+#     constant_names = 'barr_height  cv_eq'
+#     constant_expressions = '0.1          1.0e-2'
+#     function = 16*barr_height*(c-cv_eq)^2*(1-cv_eq-c)^2+eta0*(1-eta0)*c+eta1*(1-eta1)*c
+#     derivative_order = 2
+#   [../]
+#   
   [./chemical_free_energy]
     type = DerivativeParsedMaterial
     f_name = Fc
     args = 'c gr0 gr1'
     constant_names = 'A  B'
     constant_expressions = '16.0 1.0'
-    material_property_names = 'sumofgr'
-    function = A*c^2*(1-c)^2+B*(c^2+6*(1-c)*sumofgr-4*(2-c)*(gr0^3+gr1^3)+3*sumofgr^2)
+    function = A*c^2*(1-c)^2+B*(c^2+6*(1-c)*(gr0^2+gr1^2)-4*(2-c)*(gr0^3+gr1^3)+3*(gr0^2+gr1^2)^2)
     derivative_order = 2
   [../]
-  [./phi]
-    type = DerivativeParsedMaterial
-    f_name = phi
-    args = 'c'
-    function = 'c * c * c * (10 - 15 * c + 6 * c * c)'
-    derivative_order = 2
-    outputs = exodus
+  # [./Dv]
+  #   type = GenericConstantMaterial
+  #   block = 0
+  #   prop_names = '  Dv'
+  #   prop_values = ' 0.01 '
+  # [../]
+  [./Voldiffusion]
+    type = ParsedMaterial
+    block = 0
+    f_name = Dv
+    args = 'temp'
+    function = 0.01+0.00001*temp
   [../]
-#   [./Dv_temp]
-#     type = DerivativeParsedMaterial
-#     f_name = Dv_temp
-#     args = 'temp'
-#     constant_names = 'Dvol'
-#     constant_expressions = '0.01'
-#     function = 'Dvol+0.0001*temp'
-#     derivative_order = 2
-#     outputs = exodus
-#   [../]
-#    [./youngs_modulus]
-#     type = PiecewiseLinearInterpolationMaterial
-#     x = '100 500'
-#     y = '1e6 6e5'
-#     property = youngs_modulus
-#     variable = temp
-#   [../]
-  [./Dv_temp]
-    type = ADPiecewiseLinearInterpolationMaterial
-    property = Dv_temp
-    variable = temp
-    x = '400 500 600 700'
-    y = '0.01  0.02 0.03 0.04'
+  [./CH_mat]
+    type = PFDiffusionGrowthM2
+    block = 0
+    material_property_names = 'Voldiffusion(temp)'
+    Dvol = Voldiffusion(temp)
+    rho = c
+    v = 'gr0 gr1'
+    outputs = console
   [../]
- [./mobility]
-    type = DerivativeParsedMaterial
-    f_name = D
-    args = 'c gr0 gr1'
-    constant_names = 'Dvap Dsurf Dgb'
-    constant_expressions = '0.001 4 0.4'
-    # Dvol = Dv_temp
-    material_property_names = 'Dv_temp phi'
-    function = 'Dv_temp*phi+Dvap*(1.0-phi)+Dsurf*c*(1-c)+Dgb*gr0*gr1'
-    derivative_order = 2
-    outputs = exodus
-  [../]
-#   [./CH_mat]
-#     type = PFDiffusionGrowthM3
-#     block = 0
-#     Dvol = 0.01
-#     rho = c
-#     T = temp
-#     v = 'gr0 gr1'
-#     outputs = console
-#   [../]
   [./constant_mat]
     type = GenericConstantMaterial
     block = 0
     prop_names = '  A    B   L    kappa_op kappa_c'
     prop_values = ' 16.0 1.0 1.0  0.5      1.0    '
   [../]
+ #   [./var_dependence]
+ #     type = DerivativeParsedMaterial
+ #     block = 0
+ #     # eigenstrain coefficient
+ #     # -0.1 will result in an undersized precipitate
+ #     #  0.1 will result in an oversized precipitate
+ #     function = 0.1*c
+ #     args = c
+ #     f_name = var_dep
+ #     enable_jit = true
+ #     derivative_order = 2
+ #   [../]
   [./elasticity_tensor]
     type = ComputeElasticityTensor
     block = 0
@@ -309,6 +416,24 @@
     type = ComputeLinearElasticStress
     block = 0
   [../]
+    [./var_dependence]
+    type = DerivativeParsedMaterial
+    block = 0
+    function = 0.2*c
+    args = c
+    f_name = var_dep
+    enable_jit = true
+    derivative_order = 2
+  [../]
+  # [./eigenstrain]
+  #   type = ComputeVariableEigenstrain
+  #   block = 0
+  #   eigen_base = '1 1 1 0 0 0'
+  #   prefactor = var_dep
+  #   #outputs = exodus
+  #   args = 'c'
+  #   eigenstrain_name = eigenstrain
+  # [../]
   [./strain]
     type = ComputeSmallStrain
     # block = 0
@@ -350,12 +475,19 @@
     thermal_conductivity = 1.0
   [../]
   [./poissons_ratio]
-    type = ADPiecewiseLinearInterpolationMaterial
+    type = PiecewiseLinearInterpolationMaterial
     x = '100 500'
     y = '0   0.25'
     property = poissons_ratio
     variable = temp
   [../]
+  # [./density]
+  #   type = Density
+  #   density = 1.0
+  #   disp_x = disp_x
+  #   disp_y = disp_y
+  #   # disp_z = disp_z
+  # [../]
 []
 
 [VectorPostprocessors]
@@ -377,6 +509,11 @@
 []
 
 [Postprocessors]
+  # [./temp]
+  #   type = AverageNodalVariableValue
+  #   variable = temp
+  #   output = exodus
+  # [../]
   [./elem_c]
     type = ElementIntegralVariablePostprocessor
     variable = c
@@ -420,6 +557,10 @@
     type = ElementIntegralVariablePostprocessor
     variable = gr1
   [../]
+#   [./grain_size_gr2]
+#     type = ElementIntegralVariablePostprocessor
+#     variable = gr2
+#   [../]
   [./gb_area]
     type = GrainBoundaryArea
   [../]
@@ -437,11 +578,11 @@
   type = Transient
   scheme = BDF2
   # solve_type = NEWTON
-  solve_type = 'PJFNK'
-  petsc_options_iname = '-pc_type -ksp_grmres_restart -sub_ksp_type -sub_pc_type -pc_asm_overlap'
+   solve_type = 'PJFNK'
+ petsc_options_iname = '-pc_type -ksp_grmres_restart -sub_ksp_type -sub_pc_type -pc_asm_overlap'
   petsc_options_value = 'asm         31   preonly   lu      1'
-  l_max_its = 20
-  nl_max_its = 20
+  l_max_its = 15
+  nl_max_its = 15
   nl_abs_tol = 1e-04
   nl_rel_tol = 1e-04
   l_tol = 1e-04

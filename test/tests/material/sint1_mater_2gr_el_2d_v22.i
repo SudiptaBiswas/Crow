@@ -213,81 +213,29 @@
     type = DirichletBC
     variable = temp
     boundary = bottom
-    value = 400
+    value = 700
   [../]
 []
 
 [Materials]
-  [./sumofgr]
-    type = DerivativeParsedMaterial
-    f_name = sumofgr
-    args = 'gr0 gr1'
-    function = (gr0^2+gr1^2)
-    derivative_order = 2
-  [../]
   [./chemical_free_energy]
     type = DerivativeParsedMaterial
     f_name = Fc
     args = 'c gr0 gr1'
     constant_names = 'A  B'
     constant_expressions = '16.0 1.0'
-    material_property_names = 'sumofgr'
-    function = A*c^2*(1-c)^2+B*(c^2+6*(1-c)*sumofgr-4*(2-c)*(gr0^3+gr1^3)+3*sumofgr^2)
+    function = A*c^2*(1-c)^2+B*(c^2+6*(1-c)*(gr0^2+gr1^2)-4*(2-c)*(gr0^3+gr1^3)+3*(gr0^2+gr1^2)^2)
     derivative_order = 2
   [../]
-  [./phi]
-    type = DerivativeParsedMaterial
-    f_name = phi
-    args = 'c'
-    function = 'c * c * c * (10 - 15 * c + 6 * c * c)'
-    derivative_order = 2
-    outputs = exodus
+  [./CH_mat]
+    type = PFDiffusionGrowthM3
+    block = 0
+    Dvol = 0.01
+    rho = c
+    T = temp
+    v = 'gr0 gr1'
+    outputs = console
   [../]
-#   [./Dv_temp]
-#     type = DerivativeParsedMaterial
-#     f_name = Dv_temp
-#     args = 'temp'
-#     constant_names = 'Dvol'
-#     constant_expressions = '0.01'
-#     function = 'Dvol+0.0001*temp'
-#     derivative_order = 2
-#     outputs = exodus
-#   [../]
-#    [./youngs_modulus]
-#     type = PiecewiseLinearInterpolationMaterial
-#     x = '100 500'
-#     y = '1e6 6e5'
-#     property = youngs_modulus
-#     variable = temp
-#   [../]
-  [./Dv_temp]
-    type = ADPiecewiseLinearInterpolationMaterial
-    property = Dv_temp
-    variable = temp
-    x = '400 500 600 700'
-    y = '0.01  0.02 0.03 0.04'
-  [../]
- [./mobility]
-    type = DerivativeParsedMaterial
-    f_name = D
-    args = 'c gr0 gr1'
-    constant_names = 'Dvap Dsurf Dgb'
-    constant_expressions = '0.001 4 0.4'
-    # Dvol = Dv_temp
-    material_property_names = 'Dv_temp phi'
-    function = 'Dv_temp*phi+Dvap*(1.0-phi)+Dsurf*c*(1-c)+Dgb*gr0*gr1'
-    derivative_order = 2
-    outputs = exodus
-  [../]
-#   [./CH_mat]
-#     type = PFDiffusionGrowthM3
-#     block = 0
-#     Dvol = 0.01
-#     rho = c
-#     T = temp
-#     v = 'gr0 gr1'
-#     outputs = console
-#   [../]
   [./constant_mat]
     type = GenericConstantMaterial
     block = 0
@@ -309,6 +257,15 @@
     type = ComputeLinearElasticStress
     block = 0
   [../]
+#     [./var_dependence]
+#     type = DerivativeParsedMaterial
+#     block = 0
+#     function = 0.2*c
+#     args = c
+#     f_name = var_dep
+#     enable_jit = true
+#     derivative_order = 2
+#   [../]
   [./strain]
     type = ComputeSmallStrain
     # block = 0
@@ -350,7 +307,7 @@
     thermal_conductivity = 1.0
   [../]
   [./poissons_ratio]
-    type = ADPiecewiseLinearInterpolationMaterial
+    type = PiecewiseLinearInterpolationMaterial
     x = '100 500'
     y = '0   0.25'
     property = poissons_ratio
@@ -440,8 +397,8 @@
   solve_type = 'PJFNK'
   petsc_options_iname = '-pc_type -ksp_grmres_restart -sub_ksp_type -sub_pc_type -pc_asm_overlap'
   petsc_options_value = 'asm         31   preonly   lu      1'
-  l_max_its = 20
-  nl_max_its = 20
+  l_max_its = 15
+  nl_max_its = 15
   nl_abs_tol = 1e-04
   nl_rel_tol = 1e-04
   l_tol = 1e-04

@@ -264,15 +264,15 @@
     derivative_order = 2
     outputs = exodus
   [../]
-#   [./CH_mat]
-#     type = PFDiffusionGrowthM3
-#     block = 0
-#     Dvol = 0.01
-#     rho = c
-#     T = temp
-#     v = 'gr0 gr1'
-#     outputs = console
-#   [../]
+  [./CH_mat]
+    type = PFDiffusionGrowthM3
+    block = 0
+    Dvol = 0.01
+    rho = c
+    T = temp
+    v = 'gr0 gr1'
+    outputs = console
+  [../]
   [./constant_mat]
     type = GenericConstantMaterial
     block = 0

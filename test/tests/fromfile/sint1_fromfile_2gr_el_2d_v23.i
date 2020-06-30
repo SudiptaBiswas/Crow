@@ -14,15 +14,38 @@
   displacements = 'disp_x disp_y'
   var_name_base = gr
   op_num = 2.0
-  int_width = 1.0
+  int_width = 2.0
 []
 
 [Variables]
   [./c]
-    #scaling = 10
+    order = FIRST
+    family = LAGRANGE
+    # [./InitialCondition]
+    #   x_positions = '12.6	24.7'
+    #   y_positions = '22.4	24.1'
+    #   z_positions = '0 0'
+    #   radii = '6.25	8.25'
+    # # file_name = 'TwoCircles.txt'
+    #   int_width = 2.0
+    #   3D_spheres = false
+    #   outvalue = 0.05
+    #   variable = 'gr0 gr1'
+    #   invalue = 0.95
+    #   type = SpecifiedSmoothCircleIC
+    #   block = 0
+    # [../]
   [../]
   [./w]
   [../]
+  # [./gr0]
+  #   order = FIRST
+  #   family = LAGRANGE
+  # [../]
+  # [./gr1]
+  #   order = FIRST
+  #   family = LAGRANGE
+  # [../]
   [./PolycrystalVariables]
   [../]
   [./disp_x]
@@ -39,39 +62,51 @@
 []
 
 [ICs]
-  [./ic_gr1]
-    int_width = 2.0
-    x1 = 12.592
-    y1 = 22.4133
-    radius = 6.25
-    outvalue = 0.01
-    variable = gr1
-    invalue = 0.99
-    type = SmoothCircleIC
-  [../]
-  [./ic_gr0]
-    int_width = 2.0
-    x1 = 24.6702
-    y1 = 24.1294
-    radius = 6.25
-    outvalue = 0.01
-    variable = gr0
-    invalue = .99
-    type = SmoothCircleIC
-  [../]
-  [./multip]
-    x_positions = '12.592	24.6702'
-    y_positions = '22.4133	24.1294'
-    z_positions = '0 0'
-    radii = '6.25	8.25'
-    int_width = 2.0
-    3D_spheres = false
-    outvalue = 0.01
+  [./IC_c]
+    type = SmoothCircleFromFileIC
+    # type = SpecifiedSmoothCircleIC
+    file_name = 'TwoCircles.txt'
+    invalue = 0.95
+    outvalue = 0.05
     variable = c
-    invalue = 0.99
-    type = SpecifiedSmoothCircleIC
+    int_width = 2
     block = 0
   [../]
+
+  # [./ic_gr1]
+  #   int_width = 2.0
+  #   x1 = 12.6
+  #   y1 = 22.4
+  #   radius = 6.25
+  #   outvalue = 0.05
+  #   variable = gr1
+  #   invalue = 0.95
+  #   type = SmoothCircleIC
+  # [../]
+  # [./ic_gr0]
+  #   int_width = 2.0
+  #   x1 = 24.7
+  #   y1 = 24.1
+  #   radius = 6.25
+  #   outvalue = 0.05
+  #   variable = gr0
+  #   invalue = .95
+  #   type = SmoothCircleIC
+  # [../]
+  # [./multip]
+  #   x_positions = '12.6	24.7'
+  #   y_positions = '22.4	24.1'
+  #   z_positions = '0 0'
+  #   radii = '6.25	8.25'
+  #   # file_name = 'TwoCircles.txt'
+  #   int_width = 2.0
+  #   3D_spheres = false
+  #   outvalue = 0.05
+  #   variable = c
+  #   invalue = 0.95
+  #   type = SpecifiedSmoothCircleIC
+  #   block = 0
+  # [../]
 []
 
 [AuxVariables]
@@ -111,6 +146,14 @@
 []
 
 [Kernels]
+  [./dt_gr0]
+    type = TimeDerivative
+    variable = gr0
+  [../]
+  [./dt_gr1]
+    type = TimeDerivative
+    variable = gr1
+  [../]
   [./heat]
     type = HeatConduction
     variable = temp
@@ -213,7 +256,7 @@
     type = DirichletBC
     variable = temp
     boundary = bottom
-    value = 400
+    value = 700
   [../]
 []
 
@@ -235,59 +278,16 @@
     function = A*c^2*(1-c)^2+B*(c^2+6*(1-c)*sumofgr-4*(2-c)*(gr0^3+gr1^3)+3*sumofgr^2)
     derivative_order = 2
   [../]
-  [./phi]
-    type = DerivativeParsedMaterial
-    f_name = phi
-    args = 'c'
-    function = 'c * c * c * (10 - 15 * c + 6 * c * c)'
-    derivative_order = 2
-    outputs = exodus
+  # [./Dv]
+  [./CH_mat]
+    type = PFDiffusionGrowthM3
+    block = 0
+    Dvol = 0.01
+    rho = c
+    T = temp
+    v = 'gr0 gr1'
+    outputs = console
   [../]
-#   [./Dv_temp]
-#     type = DerivativeParsedMaterial
-#     f_name = Dv_temp
-#     args = 'temp'
-#     constant_names = 'Dvol'
-#     constant_expressions = '0.01'
-#     function = 'Dvol+0.0001*temp'
-#     derivative_order = 2
-#     outputs = exodus
-#   [../]
-#    [./youngs_modulus]
-#     type = PiecewiseLinearInterpolationMaterial
-#     x = '100 500'
-#     y = '1e6 6e5'
-#     property = youngs_modulus
-#     variable = temp
-#   [../]
-  [./Dv_temp]
-    type = ADPiecewiseLinearInterpolationMaterial
-    property = Dv_temp
-    variable = temp
-    x = '400 500 600 700'
-    y = '0.01  0.02 0.03 0.04'
-  [../]
- [./mobility]
-    type = DerivativeParsedMaterial
-    f_name = D
-    args = 'c gr0 gr1'
-    constant_names = 'Dvap Dsurf Dgb'
-    constant_expressions = '0.001 4 0.4'
-    # Dvol = Dv_temp
-    material_property_names = 'Dv_temp phi'
-    function = 'Dv_temp*phi+Dvap*(1.0-phi)+Dsurf*c*(1-c)+Dgb*gr0*gr1'
-    derivative_order = 2
-    outputs = exodus
-  [../]
-#   [./CH_mat]
-#     type = PFDiffusionGrowthM3
-#     block = 0
-#     Dvol = 0.01
-#     rho = c
-#     T = temp
-#     v = 'gr0 gr1'
-#     outputs = console
-#   [../]
   [./constant_mat]
     type = GenericConstantMaterial
     block = 0
@@ -309,6 +309,15 @@
     type = ComputeLinearElasticStress
     block = 0
   [../]
+#     [./var_dependence]
+#     type = DerivativeParsedMaterial
+#     block = 0
+#     function = 0.2*c
+#     args = c
+#     f_name = var_dep
+#     enable_jit = true
+#     derivative_order = 2
+#   [../]
   [./strain]
     type = ComputeSmallStrain
     # block = 0
@@ -350,7 +359,7 @@
     thermal_conductivity = 1.0
   [../]
   [./poissons_ratio]
-    type = ADPiecewiseLinearInterpolationMaterial
+    type = PiecewiseLinearInterpolationMaterial
     x = '100 500'
     y = '0   0.25'
     property = poissons_ratio
@@ -440,8 +449,8 @@
   solve_type = 'PJFNK'
   petsc_options_iname = '-pc_type -ksp_grmres_restart -sub_ksp_type -sub_pc_type -pc_asm_overlap'
   petsc_options_value = 'asm         31   preonly   lu      1'
-  l_max_its = 20
-  nl_max_its = 20
+  l_max_its = 15
+  nl_max_its = 15
   nl_abs_tol = 1e-04
   nl_rel_tol = 1e-04
   l_tol = 1e-04
