@@ -104,7 +104,7 @@ Real BubblesBicrystalIC::value(const Point &p) {
 
     bub_center(1) = bubcent[bub];
 
-    Real dist = (p - bub_center).size();
+    Real dist = (p - bub_center).norm();
 
     // Bubble interior...
     if (dist < rcurv) {

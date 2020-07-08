@@ -128,7 +128,7 @@ void RadiationDefectCreation::computeQpProperties() {
                 _range(i) - std::abs(_q_point[_qp](i) - _NImpPos[ht](i));
       }
 
-      Real rad = _spacing * p_difference.size();
+      Real rad = _spacing * p_difference.norm();
 
       // Set the vacancy and interstitial increases
 

@@ -50,8 +50,8 @@ Real TwoParticleGrainsIC::value(const Point &p) {
   grain_center_right(1) = _bottom_left(1) + _rangedomain(1) / 2.0;
   grain_center_right(2) = _bottom_left(2) + _rangedomain(2) / 2.0;
 
-  Real dist_left = (p - grain_center_left).size();
-  Real dist_right = (p - grain_center_right).size();
+  Real dist_left = (p - grain_center_left).norm();
+  Real dist_right = (p - grain_center_right).norm();
 
   if ((dist_left <= radius_left && _op_index == 0) ||
       (dist_right <= radius_right && _op_index == 1))

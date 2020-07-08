@@ -8,8 +8,8 @@ template <> InputParameters validParams<TwoParticleDensityIC>() {
   InputParameters params = validParams<InitialCondition>();
   // params.addParam<Real>("min", 0.0, "Lower bound of the randomly generated
   // values");  params.addParam<Real>("max", 1.0, "Upper bound of the randomly
-  // generated values");  params.addParam<unsigned int>("seed", 0, "Seed value for
-  // the random number generator");
+  // generated values");  params.addParam<unsigned int>("seed", 0, "Seed value
+  // for the random number generator");
   params.addParam<Real>("tol", 1e-6,
                         "Upper bound of the randomly generated values");
   params.addRequiredParam<unsigned int>("op_num",
@@ -69,8 +69,8 @@ Real TwoParticleDensityIC::value(const Point &p) {
   grain_center_right(2) = _bottom_left(2) + _rangedomain(2) / 2.0;
 
   // Real radius = _range(0)/5.0;
-  Real dist_left = (p - grain_center_left).size();
-  Real dist_right = (p - grain_center_right).size();
+  Real dist_left = (p - grain_center_left).norm();
+  Real dist_right = (p - grain_center_right).norm();
 
   for (unsigned int _op_index = 0.0; _op_index < _op_num; _op_index++) {
     if ((dist_left <= radius_left && _op_index == 0) ||

@@ -112,7 +112,7 @@ void MultiSmoothParticleIC::computeCircleCenters() {
 
       for (unsigned int j = 0; j < i; j++) {
         if (j == 0)
-          rr = _range.size();
+          rr = _range.norm();
 
         Real tmp_rr =
             _mesh.minPeriodicDistance(_var.number(), _centers[j], newcenter);
@@ -122,7 +122,7 @@ void MultiSmoothParticleIC::computeCircleCenters() {
       }
 
       if (i == 0)
-        rr = _range.size();
+        rr = _range.norm();
 
       // Verify not out of bounds
       if (_avoid_bounds && newcenter(0) < _radii[i] + _int_width)
