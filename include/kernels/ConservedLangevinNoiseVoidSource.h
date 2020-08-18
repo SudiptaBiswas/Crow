@@ -8,7 +8,7 @@
 class ConservedLangevinNoiseVoidSource;
 
 template<>
-InputParameters validParams<LangevinNoise>();
+InputParameters validParams<ConservedLangevinNoiseVoidSource>();
 
 class ConservedLangevinNoiseVoidSource : public LangevinNoise
 {
