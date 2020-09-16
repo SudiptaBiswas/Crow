@@ -1,27 +1,18 @@
-#ifndef CONSERVEDLANGEVINNOISEVOIDSOURCE_H
-#define CONSERVEDLANGEVINNOISEVOIDSOURCE_H
+#pragma once
 
-#include "LangevinNoise.h"
 #include "ConservedNoiseBase.h"
+#include "LangevinNoise.h"
 
-//Forward Declarations
-class ConservedLangevinNoiseVoidSource;
-
-template<>
-InputParameters validParams<LangevinNoise>();
-
-class ConservedLangevinNoiseVoidSource : public LangevinNoise
-{
+class ConservedLangevinNoiseVoidSource : public LangevinNoise {
 public:
-  ConservedLangevinNoiseVoidSource(const InputParameters & parameters);
+  static InputParameters validParams();
+  ConservedLangevinNoiseVoidSource(const InputParameters &parameters);
 
 protected:
-  virtual void residualSetup() {};
+  virtual void residualSetup(){};
   virtual Real computeQpResidual();
 
 private:
-  const ConservedNoiseInterface & _noise;
-  const VariableValue & _eta;
+  const ConservedNoiseInterface &_noise;
+  const VariableValue &_eta;
 };
-
-#endif //CONSERVEDLANGEVINNOISE_H

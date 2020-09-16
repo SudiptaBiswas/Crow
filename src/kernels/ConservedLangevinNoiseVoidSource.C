@@ -2,8 +2,8 @@
 
 registerMooseObject("CrowApp", ConservedLangevinNoiseVoidSource);
 
-template <> InputParameters validParams<ConservedLangevinNoiseVoidSource>() {
-  InputParameters params = validParams<LangevinNoise>();
+InputParameters ConservedLangevinNoiseVoidSource::validParams() {
+  InputParameters params = LangevinNoise::validParams();
   params.addRequiredParam<UserObjectName>(
       "noise", "ConservativeNoise userobject that produces the random numbers");
   params.addRequiredCoupledVar("eta", "order parameter for void");
